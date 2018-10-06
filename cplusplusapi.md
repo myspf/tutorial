@@ -37,18 +37,16 @@ int main(int argc, char *argv[]){
 g++ 编译命令如下：
 > g++ main.cpp -std=c++11 -DLINUX -DLOGGING_LEVEL_2 -O2 -I../include -lDolphinDBAPI -lssl  -lpthread -luuid -L../bin  -Wl,-rpath ../bin/ -o main
 
-### 3、登录dolphindb
 
-
-### 4、执行dolphindb script
-#### 4.1 创建连接
-#### 4.2 执行脚本
-#### 4.3 不同类型的返回值
-##### 4.3.1 vector
-##### 4.3.2 set
-##### 4.3.3 matrix
-##### 4.3.4 dictionary
-##### 4.3.5 table
+### 3、执行dolphindb script
+#### 3.1 创建连接
+#### 3.2 执行脚本
+#### 3.3 不同类型的返回值
+##### 3.3.1 vector
+##### 3.3.2 set
+##### 3.3.3 matrix
+##### 3.3.4 dictionary
+##### 3.3.5 table
 
 ### 6、调用dolphindb 内置函数
 
