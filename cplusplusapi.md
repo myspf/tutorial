@@ -10,6 +10,7 @@
 > bin (libDolphinDBAPI.so)
   include (DolphinDB.h  Exceptions.h  SmartPointer.h  SysIO.h  Types.h  Util.h)
 #### 2.3 编写main.cpp文件
+在与bin和include平级目录创建目录project，进入project并创建文件main.cpp，内容如下：
 ```
 #include "DolphinDB.h"
 #include "Util.h"
@@ -19,8 +20,8 @@ using namespace dolphindb;
 using namespace std;
 
 int main(int argc, char *argv[]){
-    DBConnection db;
-    bool ret = db.connect("localhost", 8080);
+    DBConnection conn;
+    bool ret = conn.connect("localhost", 8080);
     if(!ret){
         cout<<"Failed to connect to the server"<<endl;
         return 0;
@@ -33,6 +34,8 @@ int main(int argc, char *argv[]){
 }
 ```
 #### 2.3 编译
+g++ 编译命令如下：
+> g++ main.cpp -std=c++11 -DLINUX -DLOGGING_LEVEL_2 -O2 -I../include -lDolphinDBAPI -lssl  -lpthread -luuid -L../bin  -Wl,-rpath ../bin/ -o main
 
 ### 3、登录dolphindb
 
