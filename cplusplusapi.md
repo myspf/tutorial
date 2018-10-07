@@ -93,19 +93,28 @@ run方法返回DataTime类型的Vector。
 run方法返回Int类型的Set，输出：set(5,2,3,4,11,6)
 ##### 3.3.3 Matrix
 ```
-	ConstantSP matrix = conn.run("1..6$2:3");
-	cout<<matrix->getString()<<endl;
+    ConstantSP matrix = conn.run("1..6$2:3");
+    cout<<matrix->getString()<<endl;
 ```
-
+run方法返回Int类型的Matrix。
 
 ##### 3.3.4 Dictionary
 ```
-	ConstantSP dict = conn.run("dict(1 2 3,`IBM`MSFT`GOOG)");
-	cout << dict->get(Util::createInt(1))->getString()<<endl;
+    ConstantSP dict = conn.run("dict(1 2 3,`IBM`MSFT`GOOG)");
+    cout << dict->get(Util::createInt(1))->getString()<<endl;
 ```
 run方法返回Dictionary，输出：IBM；
 另外，Dictionary的get方法，接受一个词典的key类型的参数（本例中，keys为 1 2 3，为Int类型），通过Util::createInt()函数来创建一个Int类型的对象。
 ##### 3.3.5 Table
+```
+string sb;
+sb.append("n=20000\n");
+sb.append("syms=`IBM`C`MS`MSFT`JPM`ORCL`BIDU`SOHU`GE`EBAY`GOOG`FORD`GS`PEP`USO`GLD`GDX`EEM`FXI`SLV`SINA`BAC`AAPL`PALL`YHOO`KOH`TSLA`CS`CISO`SUN\n");
+sb.append("mytrades=table(09:30:00+rand(18000,n) as timestamp,rand(syms,n) as sym, 10*(1+rand(100,n)) as qty,5.0+rand(100.0,n) as price);\n");
+sb.append("select qty,price from mytrades where sym==`IBM;");
+ConstantSP table = conn.run(sb);
+```
+run方法返回table，包含两列 qty 和 price。
 
 ### 6、调用dolphindb 内置函数
 
