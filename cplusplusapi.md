@@ -67,11 +67,45 @@ YHOO
 如果脚本只包含一个语句，如上代码，则返回该语句的返回值；如果脚本包含多个语句，则只返回最后一个语句的返回值；如果脚本中有语法错误，或者遇到网络问题，则抛出异常。
 
 #### 3.3 不同类型的返回值
-##### 3.3.1 vector
-##### 3.3.2 set
-##### 3.3.3 matrix
-##### 3.3.4 dictionary
-##### 3.3.5 table
+DolphinDB支持多种数据类型（Int、Long、String、Date、DataTime等）和多种数据样式（Vector、Set、Matrix、Dictionary、Table等），下面举例介绍。
+##### 3.3.1 Vector
+Vector类似C++中的vector，可以构造不同数据类型的Vector，数据Int类型的Vector，如下：
+```
+    VectorSP v = conn.run("1..10");
+    int size = v->size();
+    for(int i = 0; i < size; i++)
+        cout<<v->getInt(i)<<endl;
+```
+run方法返回Int类型的Vector，输出为1到10；
+下面输出DateTime类型的Vector，如下：
+```
+    VectorSP v = conn.run("2010.10.01..2010.10.30");
+    int size = v->size();
+    for(int i = 0; i < size; i++)
+        cout<<v->getString(i)<<endl;
+```
+run方法返回DataTime类型的Vector。
+##### 3.3.2 Set
+```
+    VectorSP set = conn.run("set(4 5 5 2 3 11 6)");
+    cout<<set->getString()<<endl;
+```
+run方法返回Int类型的Set，输出：set(5,2,3,4,11,6)
+##### 3.3.3 Matrix
+```
+	ConstantSP matrix = conn.run("1..6$2:3");
+	cout<<matrix->getString()<<endl;
+```
+
+
+##### 3.3.4 Dictionary
+```
+	ConstantSP dict = conn.run("dict(1 2 3,`IBM`MSFT`GOOG)");
+	cout << dict->get(Util::createInt(1))->getString()<<endl;
+```
+run方法返回Dictionary，输出：IBM；
+另外，Dictionary的get方法，接受一个词典的key类型的参数（本例中，keys为 1 2 3，为Int类型），通过Util::createInt()函数来创建一个Int类型的对象。
+##### 3.3.5 Table
 
 ### 6、调用dolphindb 内置函数
 
