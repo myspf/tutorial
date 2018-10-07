@@ -67,7 +67,7 @@ YHOO
 如果脚本只包含一个语句，如上代码，则返回该语句的返回值；如果脚本包含多个语句，则只返回最后一个语句的返回值；如果脚本中有语法错误，或者遇到网络问题，则抛出异常。
 
 #### 3.3 不同类型的返回值
-DolphinDB支持多种数据类型（Int、Long、String、Date、DataTime等）和多种数据样式（Vector、Set、Matrix、Dictionary、Table等），下面举例介绍。
+DolphinDB支持多种数据类型（Int、Long、String、Date、DataTime等）和多种数据样式（Vector、Set、Matrix、Dictionary、Table、AnyVector等），下面举例介绍。
 ##### 3.3.1 Vector
 Vector类似C++中的vector，可以构造不同数据类型的Vector，数据Int类型的Vector，如下：
 ```
@@ -115,6 +115,19 @@ sb.append("select qty,price from mytrades where sym==`IBM;");
 ConstantSP table = conn.run(sb);
 ```
 run方法返回table，包含两列 qty 和 price。
+##### 3.3.6 AnyVector
+AnyVector中可以包含不同的数据类型，如下：
+```
+    ConstantSP result = conn.run("{1, 2, {1,3,5},{0.9, 0.8}}");
+    cout<<result->getString()<<endl;
+```
+run方法返回AnyVector，可以通过result->get(2) 获取第2个元素{1,3,5}，如下：
+```
+    VectorSP v =  result->get(2);
+    cout<<v->getString()<<endl;
+```
+输出Int类型Vector：[1,3,5]。
+
 
 ### 6、调用dolphindb 内置函数
 
