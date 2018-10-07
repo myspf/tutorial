@@ -130,7 +130,7 @@ run方法返回AnyVector，可以通过result->get(2) 获取第2个元素{1,3,5}
 ```
 输出Int类型Vector：[1,3,5]。
 
-### 6、调用DolphinDB内置函数
+### 4、调用DolphinDB内置函数
 DolphinDB C++ API提供了在C++层面调用DolphinDB内置函数的接口，代码如下：
 ```
 	vector<ConstantSP> args;
@@ -144,7 +144,7 @@ DolphinDB C++ API提供了在C++层面调用DolphinDB内置函数的接口，代
 run方法返回sum函数的结果，sum函数接受一个Double类型的Vector，通过Util::createVector(DT_DOUBLE, 3)来创建Double Vector；
 run方法的第一个参数为string类型的函数名，第二个参数为ConstantSP类型的vector（Constant类为DolphinDB中所有类型的基类），sum输出为Double类型。
 
-### 7、上传对象到DolphinDB Server
+### 5、上传对象到DolphinDB Server
 通过C++ API可以把本地的对象上传到DolphinDB Server中，下面用例先在本地创建table对象，然后上传到Server，再从Server中获取该对象，完整代码如下：
 ```
     //本地创建table对象，包含3列
@@ -171,14 +171,3 @@ run方法的第一个参数为string类型的函数名，第二个参数为Const
 C++ API提供了在本地灵活的创建各种对象的接口，利用upload方法，可以方便的实现本地对象和Server对象的转换交互。
 
 更多的内容请参考include中的头文件。
-
-
-
-
-
-
-
-
-
-
- 
