@@ -128,9 +128,47 @@ run方法返回AnyVector，可以通过result->get(2) 获取第2个元素{1,3,5}
 ```
 输出Int类型Vector：[1,3,5]。
 
+### 6、调用DolphinDB内置函数
+DolphinDB C++ API提供了在C++层面调用 DolphinDB内置函数的接口，代码如下：
+```
+	vector<ConstantSP> args;
+	double array[] = {1.5, 2.5, 7};
+	ConstantSP vec = Util::createVector(DT_DOUBLE, 3);//创建Double类型的Vector，包含3个元素
+	vec->setDouble(0, 3, array);//给vec赋值
+	args.push_back(vec);
+	ConstantSP result = conn.run("sum", args);//调用DolphinDB内置函数sum
+	cout<<result->getString()<<endl;
+ ```
+run方法返回sum函数的结果，sum函数接受一个double类型的Vector，通过Util::createVector(DT_DOUBLE, 3)来创建Double Vector；
+run方法的第一个参数为string类型的函数名，第二个参数为ConstantSP类型的vector（Constant类为DolphinDB中所有类型的基类），sum输出为Double类型。
 
-### 6、调用dolphindb 内置函数
+### 7、upload对象到DolphinDB Server
+通过C++ API可以把本地的对象，上传到DolphinDB Server中，下面用例先在本地创建table对象，然后上传到server，再从server中获取该对象，完整代码如下：
+```
+    //本地创建table对象，包含3列
+    vector<string> colNames = {"name","price","qty"};
+    vector<DATA_TYPE> colTypes = {DT_STRING,DT_DOUBLE,DT_INT};
+    int colNum = 3,rowNum = 10;
+	   ConstantSP table = Util::createTable(colNames,colTypes,rowNum,100);
+    vector<VectorSP> columnVecs;
+    for(int i = 0 ;i < colNum ;i ++)
+        columnVecs.push_back(table->getColumn(i));
+    
+    for(unsigned int i =  0 ;i < rowNum; i++){
+        columnVecs[0]->setString(i,"name"+std::to_string(i));
+        columnVecs[1]->setDouble(i,i*10.0);
+        columnVecs[2]->setInt(i,i*100);
+    }
+   
+    //将table对象上传到server，并再从server获取该对象
+	   conn.upload("myTalbe", table);
+    string script = "myTalbe";
+    ConstantSP result = conn.run(script);
+    cout<<result->getString()<<endl;
+```
+C++ API提供了在本地灵活的创建各种对象的接口，利用upload方法，可以方便的实现本地对象和server对象的转换交互。
 
+更多的内容请参考include中的头文件
 
 
 
