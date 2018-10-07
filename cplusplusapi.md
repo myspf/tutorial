@@ -55,12 +55,14 @@ C++ API通过TCP/IP连接DolphinDB Server，connect方法通过ip和port两个�
 通过 run 方法来执行脚本，脚本的最大长度是65535bytes，如下：
 ```
     ConstantSP v = conn.run("\`IBM\`GOOG\`YHOO");
-    cout<<v->getString()<<endl;
+    int size = v->size();
+    for(int i = 0; i < size; i++)
+        cout<<v->getString(i)<<endl;
 ```
 输出如下：
 > IBM  
   GOOG  
-  YHOO  
+  YHOO
 如果脚本只包含一个语句，如上代码，则返回该语句的返回值；如果脚本包含多个语句，则只返回最后一个语句的返回值；如果脚本中有语法错误，或者遇到网络问题，则抛出异常。
 
 #### 3.3 不同类型的返回值
