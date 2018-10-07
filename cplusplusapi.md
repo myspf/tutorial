@@ -40,6 +40,17 @@ g++ 编译命令如下：
 
 ### 3、执行dolphindb script
 #### 3.1 创建连接
+C++ API通过TCP/IP连接DolphinDB Server，connect函数通过ip和port两个参数来连接，代码如下：
+```
+    DBConnection conn;
+    bool ret = conn.connect("localhost", 8080);
+```
+连接服务器时，还可以同时指定用户名和密码进行登录，代码如下：
+```
+    DBConnection conn;
+    bool ret = conn.connect("localhost", 8080,"admin","123456");
+```
+
 #### 3.2 执行脚本
 #### 3.3 不同类型的返回值
 ##### 3.3.1 vector
