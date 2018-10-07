@@ -1,15 +1,15 @@
 # DolphinDB C++ API
-本教程介绍在linux环境下，如何使用DolphinDB提供的C++ API进行应用开发。
+本教程介绍了在linux环境下，如何使用DolphinDB提供的C++ API进行应用开发。
 ### 1、环境需求
 * linux 编程环境；  
 * g++ 6.2编译器；（由于libDolphinDBAPI.so是由g++6.2编译的，为了保证ABI兼容，建议使用该版本的编译器）
  
 ### 2、编译工程
-#### 2.1 下载so文件和头文件
+#### 2.1 下载bin文件和头文件
 下载api-cplusplus，包括bin和include文件夹，如下：
 > bin (libDolphinDBAPI.so)  
   include (DolphinDB.h  Exceptions.h  SmartPointer.h  SysIO.h  Types.h  Util.h)  
-#### 2.3 编写main.cpp文件
+#### 2.2 编写main.cpp文件
 在与bin和include平级目录创建目录project，进入project并创建文件main.cpp，内容如下：
 ```
 #include "DolphinDB.h"
@@ -37,6 +37,8 @@ int main(int argc, char *argv[]){
 g++ 编译命令如下：
 > g++ main.cpp -std=c++11 -DLINUX -DLOGGING_LEVEL_2 -O2 -I../include -lDolphinDBAPI -lssl  -lpthread -luuid -L../bin  -Wl,-rpath ../bin/ -o main
 
+#### 2.4 运行
+运行main之前，需要启动DolphinDB Server，本例中需要运行本地localhost的DolphinDB Server，并设置端口为8080。然后运行main程序，成功连接到DolphinDB Server（localhost:8080)。
 
 ### 3、执行dolphindb script
 #### 3.1 创建连接
