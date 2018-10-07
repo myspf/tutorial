@@ -40,7 +40,7 @@ g++ 编译命令如下：
 
 ### 3、执行dolphindb script
 #### 3.1 创建连接
-C++ API通过TCP/IP连接DolphinDB Server，connect函数通过ip和port两个参数来连接，代码如下：
+C++ API通过TCP/IP连接DolphinDB Server，connect方法通过ip和port两个参数来连接，代码如下：
 ```
     DBConnection conn;
     bool ret = conn.connect("localhost", 8080);
@@ -52,6 +52,17 @@ C++ API通过TCP/IP连接DolphinDB Server，connect函数通过ip和port两个�
 ```
 
 #### 3.2 执行脚本
+通过 run 方法来执行脚本，脚本的最大长度是65535bytes，如下：
+```
+    ConstantSP v = conn.run("\`IBM\`GOOG\`YHOO");
+    cout<<v->getString()<<endl;
+```
+输出如下：
+> IBM  
+  GOOG  
+  YHOO  
+如果脚本只包含一个语句，如上代码，则返回该语句的返回值；如果脚本包含多个语句，则只返回最后一个语句的返回值；如果脚本中有语法错误，或者遇到网络问题，则抛出异常。
+
 #### 3.3 不同类型的返回值
 ##### 3.3.1 vector
 ##### 3.3.2 set
