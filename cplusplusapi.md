@@ -11,7 +11,7 @@
   include (DolphinDB.h  Exceptions.h  SmartPointer.h  SysIO.h  Types.h  Util.h)  
 #### 2.2 编写main.cpp文件
 在与bin和include平级目录创建目录project，进入project并创建文件main.cpp，内容如下：
-```  
+```
 #include "DolphinDB.h"
 #include "Util.h"
 #include <iostream>
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
         cout<<vector->getString(i)<<endl;
     return 0;
 }
-```  
+```
 
 #### 2.3 编译
 g++ 编译命令如下：
@@ -44,10 +44,10 @@ g++ 编译命令如下：
 ### 3、执行DolphinDB Script
 #### 3.1 创建连接
 C++ API通过TCP/IP连接DolphinDB Server，connect方法通过ip和port两个参数来连接，代码如下：
-```  
+```
 DBConnection conn;
 bool ret = conn.connect("localhost", 8080);
-```  
+```
 
 连接服务器时，还可以同时指定用户名和密码进行登录，代码如下：
 ```
@@ -63,6 +63,7 @@ int size = v->size();
 for(int i = 0; i < size; i++)
     cout<<v->getString(i)<<endl;
 ```
+
 输出如下：
 >IBM  
 GOOG  
@@ -80,6 +81,7 @@ int size = v->size();
 for(int i = 0; i < size; i++)
     cout<<v->getInt(i)<<endl;
 ```
+
 run方法返回Int类型的Vector，输出为1到10；
 下面输出DateTime类型的Vector，如下：
 ```
@@ -88,18 +90,21 @@ int size = v->size();
 for(int i = 0; i < size; i++)
     cout<<v->getString(i)<<endl;
 ```
+
 run方法返回DataTime类型的Vector。
 ##### 3.3.2 Set
 ```
 VectorSP set = conn.run("set(4 5 5 2 3 11 6)");
 cout<<set->getString()<<endl;
 ```
+
 run方法返回Int类型的Set，输出：set(5,2,3,4,11,6)
 ##### 3.3.3 Matrix
 ```
 ConstantSP matrix = conn.run("1..6$2:3");
 cout<<matrix->getString()<<endl;
 ```
+
 run方法返回Int类型的Matrix。
 
 ##### 3.3.4 Dictionary
@@ -107,6 +112,7 @@ run方法返回Int类型的Matrix。
 ConstantSP dict = conn.run("dict(1 2 3,`IBM`MSFT`GOOG)");
 cout << dict->get(Util::createInt(1))->getString()<<endl;
 ```
+
 run方法返回Dictionary，输出：IBM；
 另外，Dictionary的get方法，接受一个词典的key类型的参数（本例中，keys为 1 2 3，为Int类型），通过Util::createInt()函数来创建一个Int类型的对象。
 ##### 3.3.5 Table
@@ -118,6 +124,7 @@ sb.append("mytrades=table(09:30:00+rand(18000,n) as timestamp,rand(syms,n) as sy
 sb.append("select qty,price from mytrades where sym==`IBM;");
 ConstantSP table = conn.run(sb);
 ```
+
 run方法返回table，包含两列 qty 和 price。
 ##### 3.3.6 AnyVector
 AnyVector中可以包含不同的数据类型，如下：
@@ -125,11 +132,13 @@ AnyVector中可以包含不同的数据类型，如下：
 ConstantSP result = conn.run("{1, 2, {1,3,5},{0.9, 0.8}}");
 cout<<result->getString()<<endl;
 ```
+
 run方法返回AnyVector，可以通过result->get(2) 获取第2个元素{1,3,5}，如下：
 ```
 VectorSP v =  result->get(2);
 cout<<v->getString()<<endl;
 ```
+
 输出Int类型Vector：[1,3,5]。
 
 ### 4、调用DolphinDB内置函数
@@ -143,6 +152,7 @@ args.push_back(vec);
 ConstantSP result = conn.run("sum", args);//调用DolphinDB内置函数sum
 cout<<result->getString()<<endl;
  ```
+ 
 run方法返回sum函数的结果，sum函数接受一个Double类型的Vector，通过Util::createVector(DT_DOUBLE, 3)来创建Double Vector；
 run方法的第一个参数为string类型的函数名，第二个参数为ConstantSP类型的vector（Constant类为DolphinDB中所有类型的基类），sum输出为Double类型。
 
@@ -170,6 +180,7 @@ string script = "myTalbe";
 ConstantSP result = conn.run(script);
 cout<<result->getString()<<endl;
 ```
+
 C++ API提供了在本地灵活的创建各种对象的接口，利用upload方法，可以方便的实现本地对象和Server对象的转换交互。
 
 更多的内容请参考include中的头文件。
