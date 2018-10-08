@@ -187,7 +187,7 @@ C++ API提供了在本地灵活的创建各种对象的接口，利用upload方�
 candle_201801.csv 保存的是2018年２月份股市交易部分数据。
 
 #### 6.1 内存表
-数据仅保存在本节点内存，存取速度最快，但是节点关闭数据就不存在了，主要用于临时快速计算、保存计算结果等场景。本例将csv文件的数据保存到内存表中，代码如下：
+数据仅保存在本节点内存，存取速度最快，但是节点关闭数据就不存在了，适用于临时快速计算、临时保存计算结果等场景。由于全部保存在内存中，内存表不应太大。本例将csv文件的数据保存到内存表中，代码如下：
 ```
 string script;
 script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
@@ -200,7 +200,7 @@ run方法返回的table为内存表。
 另外，除了使用loadText，还可以用ploadText、loadTextEx来导入csv文件，并且在导入的时候，可以指定各个字段的类型。具体参考数据导入教程。
 
 #### 6.2 本地磁盘表
-数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。本例将csv文件保存为本地磁盘表，并从本地磁盘表加载到内存，代码如下：
+数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。适用于数据量不是特别大的，并且需要持久化到本地磁盘的一些业务数据。本例将csv文件保存为本地磁盘表，并从本地磁盘表加载到内存。代码如下：
 ```
 string script;
 script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
@@ -217,6 +217,22 @@ loadTable 方法从本地数据库中加载一个table到内存；
 最后，run方法返回从磁盘载入内存的table。  
 
 #### 6.3 分布式表
-
-
-更多的内容请参考include中的头文件。
+利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，但逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库，提供查询、分析等功能。
+```
+string script;
+script += "login(`admin,`123456);";
+script += "dbPath = \"dfs://SAMPLE_TRDDB\";";
+script += "tableName = `tradingDay;";
+script += "allDays = 2018.01.01..2018.01.30;";
+script += "db = database(dbPath, VALUE, allDays);"; //创建分布式数据库
+script += "pt=db.createPartitionedTable(table(1000000:0, `symbol`exchange`cycle`tradingDay`date`time`open`high`low`close`volume`turnover`unixTime, [SYMBOL,SYMBOL,INT,DATE,DATE,TIME,DOUBLE,DOUBLE,DOUBLE,DOUBLE,LONG,DOUBLE,LONG]), tableName, `tradingDay);"; //创建分布式表
+script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");"; //加载csv文件
+script += "database(dbPath).loadTable(tableName).append!(select symbol, exchange, cycle, tradingDay,date, datetimeParse(format(time,\"000000000\"),\"HHmmssSSS\"), open, high, low, close, volume, turnover,unixTime from t );";//将内存数据表保存到分布式表中
+script += "tradTable= database(dbPath).loadTable(tableName);";
+script += "select count(*) from tradTable;";
+TableSP table = conn.run(script); 
+cout<<table->getString()<<endl;
+```
+database 方法创建分布式数据库；  
+createPartitionedTable 方法创建分布式表；
+关于DolphinDB数据导入的更多信息信息，请参考[数据导入教程](https://github.com/dolphindb/Tutorials_CN/edit/master/import_data.md)
