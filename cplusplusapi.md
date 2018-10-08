@@ -197,10 +197,10 @@ cout<<table->getString()<<endl;
 ```
 
 run方法返回的table为内存表。  
-另外，除了使用loadText，还可以用ploadText、loadTextEx来导入csv文件，并且在导入的时候，可以指定各个字段的类型。具体参考数据导入教程。
+另外，除了使用loadText，还可以用ploadText、loadTextEx来导入csv文件，并且在导入的时候，可以指定各个字段的类型。具体参考[数据导入教程](https://github.com/dolphindb/Tutorials_CN/edit/master/import_data.md)
 
 #### 6.2 本地磁盘表
-数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。适用于数据量不是特别大的，并且需要持久化到本地磁盘的一些业务数据。本例将csv文件保存为本地磁盘表，并从本地磁盘表加载到内存。代码如下：
+数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。适用于数据量不是特别大，并且需要持久化到本地磁盘的数据。本例将csv文件保存到本地磁盘表，并从本地磁盘表再加载到内存。代码如下：
 ```
 string script;
 script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
@@ -217,7 +217,7 @@ loadTable 方法从本地数据库中加载一个table到内存；
 最后，run方法返回从磁盘载入内存的table。  
 
 #### 6.3 分布式表
-利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，但逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库，提供查询、分析等功能。
+利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，但逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库使用，提供查询、分析等功能。
 ```
 string script;
 script += "login(`admin,`123456);";
