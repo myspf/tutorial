@@ -183,23 +183,38 @@ cout<<result->getString()<<endl;
 C++ API提供了在本地灵活的创建各种对象的接口，利用upload方法，可以方便的实现本地对象和Server对象的转换交互。
 
 ### 6、数据导入
-利用C++ API可以方便的进行数据导入，DolphinDB用表来存储数据。有三种类型的表，内存表、本地磁盘表及分布式表。下面介绍如何利用Ｃ++ API 将一个CSV文件导入DolphinDB中，并保存到不同类型的表中。
+利用C++ API可以方便的进行数据导入，DolphinDB用表来存储数据。有三种类型的表，内存表、本地磁盘表及分布式表。下面介绍如何利用Ｃ++ API 将一个csv文件导入DolphinDB中，并保存到不同类型的表中。
 candle_201801.csv 保存的是2018年２月份股市交易部分数据。
 
 #### 6.1 内存表
-内存表是数据仅保存在本节点内存，存取速度最快，但是节点关闭数据就不存在了，主要用于临时快速计算、保存计算结果等场景。
+数据仅保存在本节点内存，存取速度最快，但是节点关闭数据就不存在了，主要用于临时快速计算、保存计算结果等场景。本例将csv文件的数据保存到内存表中，代码如下：
 ```
 string script;
 script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
-script += "t;";
+script += "select * from t;";
 TableSP table = conn.run(script); 
 cout<<table->getString()<<endl;
 ```
 
 run方法返回的table为内存表。
 另外，除了使用loadText，还可以用ploadText、loadTextEx来导入csv文件，并且在导入的时候，可以指定各个字段的类型。具体参考数据导入教程。
-#### 6.2 本地磁盘表
 
+#### 6.2 本地磁盘表
+数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。本例将csv文件保存为本地磁盘表，并从本地磁盘表加载到内存，代码如下：
+```
+string script;
+script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
+script += "db=database(\"/home/psui/localDiskTable\");";
+script += "saveTable(db,t,`t1);";
+script += "tdisk=loadTable(db,`t1);";
+script += "select * from tdisk;";
+TableSP table = conn.run(script); 
+cout<<table->getString()<<endl;
+```
+database 方法接受一个本地路径，创建一个本地数据库；
+saveTable 方法将内存内存表保存到本地数据库中，并存盘；
+loadTable 方法从本地数据库中加载一个table到内存；
+最后，run方法返回从磁盘载入内存的table。
 
 #### 6.3 分布式表
 
