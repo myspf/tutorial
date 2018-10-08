@@ -1,5 +1,10 @@
 # DolphinDB C++ API
-本教程介绍了在linux环境下，如何使用DolphinDB提供的C++ API进行应用开发。
+本教程介绍了在linux环境下，如何使用DolphinDB提供的C++ API进行应用开发。主要包括一下内容：
+* 工程编译  
+* 执行DolphinDB Script  
+* 调用内置函数  
+* 上传本地对象到Server  
+* 数据导入  
 ### 1、环境需求
 * linux 编程环境；  
 * g++ 6.2编译器；（由于libDolphinDBAPI.so是由g++6.2编译的，为了保证ABI兼容，建议使用该版本的编译器）
@@ -156,7 +161,7 @@ cout<<result->getString()<<endl;
 run方法返回sum函数的结果，sum函数接受一个Double类型的Vector，通过Util::createVector(DT_DOUBLE, 3)来创建Double Vector；
 run方法的第一个参数为string类型的函数名，第二个参数为ConstantSP类型的vector（Constant类为DolphinDB中所有类型的基类），sum输出为Double类型。
 
-### 5、上传对象到DolphinDB Server
+### 5、上传本地对象到DolphinDB Server
 通过C++ API可以把本地的对象上传到DolphinDB Server中，下面用例先在本地创建table对象，然后上传到Server，再从Server中获取该对象，完整代码如下：
 ```
 //本地创建table对象，包含3列
