@@ -183,7 +183,7 @@ cout<<result->getString()<<endl;
 C++ API提供了在本地灵活的创建各种对象的接口，利用upload方法，可以方便的实现本地对象和Server对象的转换交互。
 
 ### 6、数据导入
-利用C++ API可以方便的进行数据导入，DolphinDB用表来存储数据。有三种类型的表，内存表、本地磁盘表及分布式表。下面介绍如何利用Ｃ++ API 将一个csv文件导入DolphinDB中，并保存到不同类型的表中。
+利用C++ API可以方便的进行数据导入，DolphinDB用表来存储数据。有三种类型的表，内存表、本地磁盘表及分布式表。下面介绍如何利用Ｃ++ API 将一个csv文件导入DolphinDB中，并保存到不同类型的表中。  
 candle_201801.csv 保存的是2018年２月份股市交易部分数据。
 
 #### 6.1 内存表
@@ -196,7 +196,7 @@ TableSP table = conn.run(script);
 cout<<table->getString()<<endl;
 ```
 
-run方法返回的table为内存表。
+run方法返回的table为内存表。  
 另外，除了使用loadText，还可以用ploadText、loadTextEx来导入csv文件，并且在导入的时候，可以指定各个字段的类型。具体参考数据导入教程。
 
 #### 6.2 本地磁盘表
@@ -211,10 +211,10 @@ script += "select * from tdisk;";
 TableSP table = conn.run(script); 
 cout<<table->getString()<<endl;
 ```
-database 方法接受一个本地路径，创建一个本地数据库；
-saveTable 方法将内存内存表保存到本地数据库中，并存盘；
-loadTable 方法从本地数据库中加载一个table到内存；
-最后，run方法返回从磁盘载入内存的table。
+database 方法接受一个本地路径，创建一个本地数据库；  
+saveTable 方法将内存内存表保存到本地数据库中，并存盘；  
+loadTable 方法从本地数据库中加载一个table到内存；  
+最后，run方法返回从磁盘载入内存的table。  
 
 #### 6.3 分布式表
 
