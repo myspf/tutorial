@@ -234,5 +234,5 @@ TableSP table = conn.run(script);
 cout<<table->getString()<<endl;
 ```
 database 方法创建分布式数据库；  
-createPartitionedTable 方法创建分布式表；
+createPartitionedTable 方法创建分布式表；  
 关于DolphinDB数据导入的更多信息信息，请参考[数据导入教程](https://github.com/dolphindb/Tutorials_CN/edit/master/import_data.md)
