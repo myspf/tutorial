@@ -205,8 +205,8 @@ C++ API提供了在本地灵活的创建各种对象的接口，利用 __upload_
 t = table(100:0, `name`date`price, [STRING, DATE, DOUBLE]);
 share  t as tglobal
 ```
-__table__ 创建内存表，指定capacity，size，列名以及类型；
-__share__ 将表设置为跨session可见；
+__table__ 创建内存表，指定capacity，size，列名以及类型；  
+__share__ 将表设置为跨session可见；  
 
 ##### 6.1.2 通过C++ API保存数据到内存表
 ```
@@ -264,8 +264,8 @@ script += "select * from tDiskGlobal;";
 TableSP result = conn.run(script); 
 cout<<result->getString()<<endl;
 ```
-__loadTable__ 从本地数据库中加载一个table到内存； 
-__append!__ 保存数据到内存表；
+__loadTable__ 从本地数据库中加载一个table到内存；   
+__append!__ 保存数据到内存表；  
 最后，run方法返回从磁盘载入内存的table。  
 注意:  
 >1、对于本地磁盘表， __append!__ 仅仅将数据添加到内存表，要将数据保存到磁盘，还必须使用 __saveTable__ 函数。  
@@ -283,7 +283,7 @@ tableName = `demoTable
 db = database(dbPath, VALUE, 2010.01.01..2010.01.30)
 pt=db.createPartitionedTable(table(1000000:0,`name`date`price,[STRING,DATE,DOUBLE]),tableName,`date)
 ```
-__database__ 创建分区数据库，并指定分区类型；
+__database__ 创建分区数据库，并指定分区类型；  
 __createPartitionedTable__ 创建分布式表，并指定表类型和分区字段；
 
 ##### 6.3.2 保存数据到分布式表
