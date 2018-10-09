@@ -1,19 +1,22 @@
 # DolphinDB C++ API
-本教程介绍了在linux环境下，如何使用DolphinDB提供的C++ API进行应用开发。主要包括一下内容：
+本教程介绍了在linux环境下，如何使用DolphinDB提供的C++ API进行应用开发。主要包括以下内容：
 * 工程编译  
 * 执行DolphinDB Script  
 * 调用内置函数  
 * 上传本地对象到Server  
 * 数据导入  
+
 ### 1、环境需求
 * linux 编程环境；  
 * g++ 6.2编译器；（由于libDolphinDBAPI.so是由g++6.2编译的，为了保证ABI兼容，建议使用该版本的编译器）
- 
+
 ### 2、编译工程
 #### 2.1 下载bin文件和头文件
 下载api-cplusplus，包括bin和include文件夹，如下：
+
 > bin (libDolphinDBAPI.so)  
-  include (DolphinDB.h  Exceptions.h  SmartPointer.h  SysIO.h  Types.h  Util.h)  
+  include (DolphinDB.h  Exceptions.h  SmartPointer.h  SysIO.h  Types.h  Util.h) 
+  
 #### 2.2 编写main.cpp文件
 在与bin和include平级目录创建目录project，进入project并创建文件main.cpp，内容如下：
 ```
@@ -26,12 +29,12 @@ using namespace std;
 
 int main(int argc, char *argv[]){
     DBConnection conn;
-    bool ret = conn.connect("localhost", 8080);
+    bool ret = conn.connect("192.168.1.25", 8503);
     if(!ret){
         cout<<"Failed to connect to the server"<<endl;
         return 0;
     }
-    ConstantSP vector = conn.run("\`IBM\`GOOG\`YHOO");
+    ConstantSP vector = conn.run("`IBM`GOOG`YHOO");
     int size = vector->rows();
     for(int i=0; i<size; ++i)
         cout<<vector->getString(i)<<endl;
@@ -44,26 +47,26 @@ g++ 编译命令如下：
 > g++ main.cpp -std=c++11 -DLINUX -DLOGGING_LEVEL_2 -O2 -I../include -lDolphinDBAPI -lssl  -lpthread -luuid -L../bin  -Wl,-rpath ../bin/ -o main
 
 #### 2.4 运行
-运行main之前，需要启动DolphinDB Server，本例中需要运行本地localhost的DolphinDB Server，并设置端口为8080。然后运行main程序，成功连接到DolphinDB Server（localhost:8080)。
+运行main之前，需要启动DolphinDB Server，本例中连接到IP为192.168.1.25，端口为8503的DolphinDB Server。然后运行main程序，成功连接到DolphinDB Server。
 
 ### 3、执行DolphinDB Script
 #### 3.1 创建连接
 C++ API通过TCP/IP连接DolphinDB Server，connect方法通过ip和port两个参数来连接，代码如下：
 ```
 DBConnection conn;
-bool ret = conn.connect("localhost", 8080);
+bool ret = conn.connect("192.168.1.25", 8503);
 ```
 
 连接服务器时，还可以同时指定用户名和密码进行登录，代码如下：
 ```
 DBConnection conn;
-bool ret = conn.connect("localhost", 8080,"admin","123456");
+bool ret = conn.connect("192.168.1.25", 8503,"admin","123456");
 ```
 
 #### 3.2 执行脚本
 通过 run 方法来执行脚本，脚本的最大长度是65535bytes，如下：
 ```
-ConstantSP v = conn.run("\`IBM\`GOOG\`YHOO");
+ConstantSP v = conn.run("`IBM`GOOG`YHOO");
 int size = v->size();
 for(int i = 0; i < size; i++)
     cout<<v->getString(i)<<endl;
@@ -222,7 +225,7 @@ loadTable 方法从本地数据库中加载一个table到内存；
 最后，run方法返回从磁盘载入内存的table。  
 
 #### 6.3 分布式表
-利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，但逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库使用，提供查询、分析等功能。
+利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库使用，提供查询、分析等功能。
 ```
 string script;
 script += "login(`admin,`123456);";
