@@ -242,7 +242,7 @@ saveTable(db,t,`dt); //保存本地表
 __database__ 方法接受一个本地路径，创建一个本地数据库；  
 __saveTable__ 方法将内存内存表保存到本地数据库中，并存盘； 
 
-##### 6.2.2 通过C++ API保存数据到table t
+##### 6.2.2 通过C++ API保存数据到本地磁盘表
 ```
 TableSP table = createDemoTable();
 conn.upload("mt",table);
