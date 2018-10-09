@@ -216,7 +216,7 @@ TableSP table = conn.run(script);
 cout<<table->getString()<<endl;
 ```
 run方法返回的table为内存表。  
-内存表中添加数据除了使用 __insert into__ 语法外，还可以使用 __append!__ ，其接受一个table作为参数，C++ API创建table的实例参考（ __5、上传本地对象到DolphinDB Server__ )，如下：
+内存表中添加数据除了使用 __insert into__ 语法外，还可以使用 __append!__ ，其接受一个table作为参数，C++ API创建table的实例参考（5、上传本地对象到DolphinDB Server)，如下：
 ```
 //假设table tlocal已经创建
 script += "t.append!(tlocal);";
@@ -226,7 +226,7 @@ script += "t.append!(tlocal);";
 
 
 #### 6.2 本地磁盘表
-数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。适用于数据量不是特别大，并且需要持久化到本地磁盘的数据。本例将csv文件保存到本地磁盘表，并从本地磁盘表再加载到内存。代码如下：
+数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。适用于数据量不是特别大，并且需要持久化到本地磁盘的数据。代码如下：
 ```
 string script;
 script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
