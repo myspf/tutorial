@@ -188,24 +188,42 @@ string script = "myTalbe";
 ConstantSP result = conn.run(script);
 cout<<result->getString()<<endl;
 ```
-C++ API提供了在本地灵活的创建各种对象的接口，利用upload方法，可以方便的实现本地对象和Server对象的转换交互。
+C++ API提供了在本地灵活的创建各种对象的接口，利用 __upload__ 方法，可以方便的实现本地对象和Server对象的转换交互。
 
-### 6、数据导入
-利用C++ API可以方便的进行数据导入，DolphinDB用表来存储数据。有三种类型的表，内存表、本地磁盘表及分布式表。下面介绍如何利用Ｃ++ API 将一个csv文件导入DolphinDB中，并保存到不同类型的表中。  
-candle_201801.csv 保存的是2018年２月份股市交易部分数据。
+### 6、数据表操作
+利用C++ API可以方便的将第三方系统业务数据添加到DolphinDB数据表中。DolphinDB支持三种类型的表， __内存表__ 、 __本地磁盘表__ 及 __分布式表__ 。下面介绍如何利用Ｃ++ API将模拟的业务数据保存到不同类型的表中。  
 
 #### 6.1 内存表
-数据仅保存在本节点内存，存取速度最快，但是节点关闭数据就不存在了，适用于临时快速计算、临时保存计算结果等场景。由于全部保存在内存中，内存表不应太大。本例将csv文件的数据保存到内存表中，代码如下：
+数据仅保存在本节点内存，存取速度最快，但是节点关闭数据就不存在了，适用于临时快速计算、临时保存计算结果等场景。由于全部保存在内存中，内存表不应太大。代码如下：
 ```
 string script;
-script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");";
+script += "t = table(100:0, `name`date`price, [STRING, DATE, DOUBLE]);";//创建内存表
+//模拟生成需要保存到内存表的数据
+VectorSP names = Util::createVector(DT_STRING,5,100);
+VectorSP dates = Util::createVector(DT_DATE,5,100);
+VectorSP prices = Util::createVector(DT_DOUBLE,5,100);
+for(int i = 0 ;i < 5;i++){
+    names->set(i,Util::createString("name_"+std::to_string(i)));
+    dates->set(i,Util::createDate(2012,1,i));
+    prices->set(i,Util::createDouble(i*i));
+} 
+vector<string> allnames = {"names","dates","prices"};
+vector<ConstantSP> allcols = {names,dates,prices};
+conn.upload(allnames,allcols);//将数据上传到server
+script += "insert into t values(names,dates,prices);"; //通过insert into 方法将数据保存到内存表中
 script += "select * from t;";
 TableSP table = conn.run(script); 
 cout<<table->getString()<<endl;
 ```
-
 run方法返回的table为内存表。  
-另外，除了使用loadText，还可以用ploadText、loadTextEx来导入csv文件，并且在导入的时候，可以指定各个字段的类型。具体参考[数据导入教程](https://github.com/dolphindb/Tutorials_CN/edit/master/import_data.md)
+内存表中添加数据除了使用 __insert into__ 语法外，还可以使用 __append!__ ，其接受一个table作为参数，C++ API创建table的实例参考（ __5、上传本地对象到DolphinDB Server__ )，如下：
+```
+//假设table tlocal已经创建
+script += "t.append!(tlocal);";
+```
+注意:  
+>本例中内存表t是通过C++ API创建的，当然也可以事先在DolphinDB Server存在，这时候如果想要在C++中访问t，需要使用 __share__ 函数（share t as tglobal），则t可以直接在C++ 中访问，share详细介绍请参考manual。
+
 
 #### 6.2 本地磁盘表
 数据保存在本地磁盘上，即使节点关闭，再启动后，可以方便的将数据加载到内存。适用于数据量不是特别大，并且需要持久化到本地磁盘的数据。本例将csv文件保存到本地磁盘表，并从本地磁盘表再加载到内存。代码如下：
@@ -219,9 +237,9 @@ script += "select * from tdisk;";
 TableSP table = conn.run(script); 
 cout<<table->getString()<<endl;
 ```
-database 方法接受一个本地路径，创建一个本地数据库；  
-saveTable 方法将内存内存表保存到本地数据库中，并存盘；  
-loadTable 方法从本地数据库中加载一个table到内存；  
+__database__ 方法接受一个本地路径，创建一个本地数据库；  
+__saveTable__ 方法将内存内存表保存到本地数据库中，并存盘；  
+__loadTable__ 方法从本地数据库中加载一个table到内存；  
 最后，run方法返回从磁盘载入内存的table。  
 
 #### 6.3 分布式表
