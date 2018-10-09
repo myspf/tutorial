@@ -179,7 +179,7 @@ TableSP createDemoTable(){
         
     for(unsigned int i =  0 ;i < rowNum; i++){
         columnVecs[0]->set(i,Util::createString("name_"+std::to_string(i)));
-        columnVecs[1]->set(i,Util::createDate(2012,1,i));
+        columnVecs[1]->set(i,Util::createDate(2010,1,i+1));
         columnVecs[2]->set(i,Util::createDouble(i*i));
     }
     return table;
@@ -241,6 +241,7 @@ saveTable(db,t,`dt); //保存本地表
 ```
 __database__ 方法接受一个本地路径，创建一个本地数据库；  
 __saveTable__ 方法将内存内存表保存到本地数据库中，并存盘； 
+
 ##### 6.2.2 通过C++ API保存数据到table t
 ```
 TableSP table = createDemoTable();
@@ -255,24 +256,38 @@ cout<<result->getString()<<endl;
 ```
 __loadTable__ 方法从本地数据库中加载一个table到内存；  
 最后，run方法返回从磁盘载入内存的table。  
+注意:  
+>对于本地磁盘表，append! 仅仅将数据添加到内存表，要将数据保存到磁盘，还必须使用saveTable函数。
 
 #### 6.3 分布式表
-利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库使用，提供查询、分析等功能。
+利用DolphinDB底层提供的分布式文件系统DFS，将数据保存在不同的节点上，逻辑上仍然可以像本地表一样做统一查询。适用于保存企业级历史数据，作为数据仓库使用，提供查询、分析等功能。本例介绍如何通过C++ API保存数据到分布式表中。
+
+##### 6.3.1 创建分布式表
+可以通过DolphinDB的任何客户端（GUI、Web notebook、console）创建分布式表，代码如下：
+```
+login(`admin,`123456)
+dbPath = "dfs://SAMPLE_TRDDB";
+tableName = `demoTable
+db = database(dbPath, VALUE, 2010.01.01..2010.01.30)
+pt=db.createPartitionedTable(table(1000000:0,`name`date`price,[STRING,DATE,DOUBLE]),tableName,`date)
+```
+__database__ 创建分区数据库，并指定分区类型；
+__createPartitionedTable__ 创建分布式表，指定表类型和分区字段；
+
+##### 6.3.2 保存数据到分布式表
+
 ```
 string script;
+TableSP table = createDemoTable();
+conn.upload("mt",table);
 script += "login(`admin,`123456);";
 script += "dbPath = \"dfs://SAMPLE_TRDDB\";";
-script += "tableName = `tradingDay;";
-script += "allDays = 2018.01.01..2018.01.30;";
-script += "db = database(dbPath, VALUE, allDays);"; //创建分布式数据库
-script += "pt=db.createPartitionedTable(table(1000000:0, `symbol`exchange`cycle`tradingDay`date`time`open`high`low`close`volume`turnover`unixTime, [SYMBOL,SYMBOL,INT,DATE,DATE,TIME,DOUBLE,DOUBLE,DOUBLE,DOUBLE,LONG,DOUBLE,LONG]), tableName, `tradingDay);"; //创建分布式表
-script += "t=loadText(\"/home/psui/C++API/api-cplusplus/test/candle_1.csv\");"; //加载csv文件
-script += "database(dbPath).loadTable(tableName).append!(select symbol, exchange, cycle, tradingDay,date, datetimeParse(format(time,\"000000000\"),\"HHmmssSSS\"), open, high, low, close, volume, turnover,unixTime from t );";//将内存数据表保存到分布式表中
-script += "tradTable= database(dbPath).loadTable(tableName);";
-script += "select count(*) from tradTable;";
-TableSP table = conn.run(script); 
-cout<<table->getString()<<endl;
+script += "tableName = `demoTable;";
+script += "database(dbPath).loadTable(tableName).append!(mt);";
+script += "select * from database(dbPath).loadTable(tableName);";
+TableSP result = conn.run(script); 
+cout<<result->getString()<<endl;
 ```
-database 方法创建分布式数据库；  
-createPartitionedTable 方法创建分布式表；  
-关于DolphinDB数据导入的更多信息信息，请参考[数据导入教程](https://github.com/dolphindb/Tutorials_CN/edit/master/import_data.md)
+__append!__ 保存数据到分布式表中，并且保存到磁盘；  
+
+更多内容请参考头文件中提供的接口。
