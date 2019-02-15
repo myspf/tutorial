@@ -3,10 +3,10 @@
 DolphinDB架构设计上保证了随着计算机资源的增加，性能几乎线性增加。DolphinDB提供了一系列参数，保证最优化集群配置，充分利用硬件资源。资源包括cpu、内存、磁盘、网络，合理的参数设置，可以是使得这些资源均衡合理，最大化发挥机器的性能。
 
 各种相关参数如下：
-cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker
-内存：maxMemSize
-磁盘：volumes、diskIOParallelLevel
-网络：maxConnections、maxConnectionPerSite、tcpNoDelay
+#cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker
+#内存：maxMemSize
+#磁盘：volumes、diskIOParallelLevel
+#网络：maxConnections、maxConnectionPerSite、tcpNoDelay
 
 DolphinDB作为系统级的数据库，包括数据写入以及分析，流计算引擎两大应用场景。
 
