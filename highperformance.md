@@ -1,15 +1,18 @@
-# DolphinDB 权限和安全
+# DolphinDB 高性能集群配置
 
-DolphinDB提供了强大、灵活、安全的权限控制系统。控制节点（controller）作为权限管理中心，使用RSA加密方式对用户关键信息进行加密。
+DolphinDB架构设计上保证了随着计算机资源的增加，性能几乎线性增加。DolphinDB提供了一系列参数，保证最优化集群配置，充分利用硬件资源。资源包括cpu、内存、磁盘、网络，合理的参数设置，可以是使得这些资源均衡合理，最大化发挥机器的性能。
 
-主要功能：
-* 提供用户和组角色，方便权限控制
-* 提供8种权限控制类别，适应各种场景
-* 丰富的权限控制函数
-* 函数视图兼顾保护数据隐私与提供分析结果
-* 对任务调度和流数据任务动态鉴权，保证系统安全
-* 使用RSA对用户关键信息加密
-* 支持SSO，简化登录，方便系统扩展
+各种相关参数如下：
+cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker
+内存：maxMemSize
+磁盘：volumes、diskIOParallelLevel
+网络：maxConnections、maxConnectionPerSite、tcpNoDelay
+
+DolphinDB作为系统级的数据库，包括数据写入以及分析，流计算引擎两大应用场景。
+
+DolphinDB集群包括controller、agent、datanode，agent只负责关闭、启动datanode。因此集群的参数配置只考虑controller和datanode即可，而上面的参数对controller和datanode都适用。
+
+
 
 ### 1. 权限概述
 
