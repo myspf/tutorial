@@ -3,7 +3,7 @@
 DolphinDB架构设计上保证了随着计算机资源的增加，性能几乎线性增加。DolphinDB提供了一系列参数，保证最优化集群配置，充分利用硬件资源（包括cpu、内存、磁盘、网络）。合理的参数配置，使系统均衡合理的使用这些资源，最大化发挥机器的性能。
 
 各种相关参数如下：
-* cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker
+* cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker、webWorkerNum
 * 内存：maxMemSize
 * 磁盘：volumes、diskIOParallelLevel
 * 网络：maxConnections、maxConnectionPerSite、tcpNoDelay
@@ -19,12 +19,25 @@ DolphinDB集群包括controller、agent、datanode，agent只负责关闭、启�
 ### 1. 选项介绍及
 按照硬件资源CPU、内存、磁盘、网络相关的选项进行介绍
 
-#### 1.1 CPU相关
+#### 1.1 CPU相关选项
+dolphindb架构采用多线程技术，合理的并发度能极大提升系统性能。并发度太低，不利用系统使用硬件的多线程能力，并发度太高，容易导致过多的线程切换，造成总体性能降低。影响并发度的主要参数如下:
 
 __workerNum__ 
+woker负责接收客户端请求，分解任务，根据任务粒度自己执行或者交给excutor执行。该参数直接决定了系统的并发数，推荐设置为：xxx
+
+__localExecutors__
+localExcutor负责执行woker分解的任务。和workNum类似，直接决定了系统的并发度，推荐设置为：
+
+相对于上面的两个参数，下面的几个参数不会直接影响性能，只是特定场景下影响系统性能。
+
+__maxBatchJobWorker__
+batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数提交的任务，通常耗时较长。该参数决定了执行批处理任务的并发度。一般情况下，推荐设置位： xxxx。 
+
+注意：如果没有批处理任务，创建的线程会回收，所以并不会占用系统资源。
+
+__maxDynamicWorker__
 
 
-引入组的概念，可以方便的对具有相同权限的用户进行权限配置和管理，用户最终的实际权限是用户本身的权限，加上所属组的权限的结果。
 
 #### 1.2 系统管理员
 
