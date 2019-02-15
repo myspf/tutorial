@@ -23,7 +23,9 @@ DolphinDB集群包括controller、agent、datanode，agent只负责关闭、启�
 dolphindb架构采用多线程技术，合理的并发度能极大提升系统性能。并发度太低，不利用系统使用硬件的多线程能力，并发度太高，容易导致过多的线程切换，造成总体性能降低。影响并发度的主要参数如下:
 
 __workerNum__  
+```
 woker负责接收客户端请求，分解任务，根据任务粒度自己执行或者交给excutor执行。该参数直接决定了系统的并发数，推荐设置为：xxx
+```
 
 __localExecutors__  
 localExcutor负责执行woker分解的任务。和workNum类似，直接决定了系统的并发度，推荐设置为：
