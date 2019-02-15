@@ -28,16 +28,24 @@ woker负责接收客户端请求，分解任务，根据任务粒度自己执行
 ```
 
 __localExecutors__  
+```
 localExcutor负责执行woker分解的任务。和workNum类似，直接决定了系统的并发度，推荐设置为：
+```
 
 相对于上面的两个参数，下面的几个参数不会直接影响性能，只是特定场景下影响系统性能。
  
 __maxBatchJobWorker__  
+```
 batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数提交的任务，通常耗时较长。该参数决定了执行批处理任务的并发度。一般情况下，推荐设置位： xxxx。 
 
 注意：如果没有批处理任务，创建的线程会回收，所以并不会占用系统资源。
+```
 
-__maxDynamicWorker__
+__maxDynamicWorker__  
+```
+dynamic worker作为上面介绍的worker的补充，当所有的worker线程占满后，如果新的任务进来，则会创建dynamic worker来执行。推荐设置位：xxx。并且用完后会释放资源。
+```
+
 
 
 
