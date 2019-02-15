@@ -12,6 +12,8 @@ DolphinDB作为系统级的数据库，包括数据写入以及分析，流计�
 
 DolphinDB集群包括controller、agent、datanode，agent只负责关闭、启动datanode。因此集群的参数配置只考虑controller和datanode即可，而上面的参数对controller和datanode都适用。
 
+目录结构
+
 
 
 ### 1. 权限概述
