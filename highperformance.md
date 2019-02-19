@@ -57,16 +57,57 @@ batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数�
 __maxDynamicWorker__  
 dynamic worker作为上面介绍的worker的补充，当所有的worker线程占满后，如果新的任务进来，则会创建dynamic worker来执行。推荐设置位：xxx。并且用完后会释放资源。
 
+__webWorkerNum__
+web worker处理http请求，表示处理http请求的线程数目。
 
 #### 1.2 内存 配置
-
+__maxMemSize__ 
+DolphinDB 实例使用的最大内存量，应该根据系统实际的物理内存，以及节点的个数来合理的设置该值。推荐设置为：xxx。
 
 #### 1.3 磁盘 配置
+__volumes__
+dfs数据库存储分区数据的位置，如果系统有多个volume，建议每个节点配置成不同的volume，这样DolphinDB从系统读写数据，可以并行的利用多个磁盘的I/O接口，大大提升读写数据的速度
+
+__diskIOParallelLevel__
+磁盘I/O并行参数。
 
 
 #### 1.4 网络 配置
+__maxConnections__
+DolphinDB每个实例，接受用户的连接，来完成用户请求。该选项限制每个实例可接受的最大连接数。
+
+
+__maxConnectionPerSite__
+该实例对外的最大连接数。
+
+__tcpNoDelay__
+Enable the TCP_NODELAY socket option。可以有效的降低时延。
+
 
 ### 2. 流计算高性能配置
+流数据作为一个较为独立的功能模块，有些配置选项专门为流计算设计，如果用户对流数据的性能要求高，可以参考如下配置选项。
+
+发布节点配置选项：
+__maxPubConnections__
+
+__persistenceWorkerNum__
+
+__maxPersistenceQueueDepth__
+
+__maxMsgNumPerBlock__
+
+__maxPubQueueDepthPerSite__
+
+订阅节点配置选项：
+__subExecutors__
+
+__maxSubConnections__
+
+__subExecutorPooling__
+
+__maxSubQueueDepth__
+
+
 
 ### 3. 典型服务器配置实例
 
