@@ -57,23 +57,23 @@ batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数�
 __maxDynamicWorker__  
 dynamic worker作为上面介绍的worker的补充，当所有的worker线程占满后，如果新的任务进来，则会创建dynamic worker来执行。推荐设置位：xxx。并且用完后会释放资源。
 
-__webWorkerNum__
+__webWorkerNum__  
 web worker处理http请求，表示处理http请求的线程数目。
 
 #### 1.2 内存 配置
-__maxMemSize__ 
+__maxMemSize__  
 DolphinDB 实例使用的最大内存量，应该根据系统实际的物理内存，以及节点的个数来合理的设置该值。推荐设置为：xxx。
 
 #### 1.3 磁盘 配置
-__volumes__
+__volumes__  
 dfs数据库存储分区数据的位置，如果系统有多个volume，建议每个节点配置成不同的volume，这样DolphinDB从系统读写数据，可以并行的利用多个磁盘的I/O接口，大大提升读写数据的速度
 
-__diskIOParallelLevel__
+__diskIOParallelLevel__  
 磁盘I/O并行参数。
 
 
 #### 1.4 网络 配置
-__maxConnections__
+__maxConnections__  
 DolphinDB每个实例，接受用户的连接，来完成用户请求。该选项限制每个实例可接受的最大连接数。
 
 #### 1.5 任务优先级和并发度配置
@@ -83,10 +83,10 @@ setMaxJobParallelism()
 优先级范围是0-8，高优先级可以获取更多的执行时间和机会。
 并行度范围是0-64，并行度代表可以并发度，高并行度可以好的利用机器的多核资源，并发执行任务。
 
-__maxConnectionPerSite__
+__maxConnectionPerSite__  
 该实例对外的最大连接数。
-
-__tcpNoDelay__
+ 
+__tcpNoDelay__  
 Enable the TCP_NODELAY socket option。可以有效的降低时延。
 
 
@@ -94,29 +94,29 @@ Enable the TCP_NODELAY socket option。可以有效的降低时延。
 流数据作为一个较为独立的功能模块，有些配置选项专门为流计算设计，如果用户对流数据的性能要求高，可以参考如下配置选项。
 
 发布节点配置选项：
-__maxPubConnections__
+__maxPubConnections__  
 发布端能够连接的最大节点数。
 
-__persistenceWorkerNum__
+__persistenceWorkerNum__  
 异步模式下，持久化流数据表到磁盘的线程数。
 
-__maxPersistenceQueueDepth__
+__maxPersistenceQueueDepth__  
 持久化消息队列的最大深度。该队列负责将数据持久化到磁盘。
 
-__maxMsgNumPerBlock__
+__maxMsgNumPerBlock__  
 发布消息每个block的最大消息条数。消息是以block为整体向subscribe发送。
 
-__maxPubQueueDepthPerSite__
+__maxPubQueueDepthPerSite__  
 publish节点的最大消息队列深度。
 
 订阅节点配置选项：
-__subExecutors__
+__subExecutors__  
 订阅节点处理收到的流数据的线程数。
 
-__maxSubConnections__
+__maxSubConnections__  
 订阅节点可建立订阅连接最大个数。
 
-__maxSubQueueDepth__
+__maxSubQueueDepth__  
 订阅节点最大消息队列深度。
 
 
