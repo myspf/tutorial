@@ -32,7 +32,7 @@ dolphindb的采用的是分布式存储技术，也就是说数据会按照分�
 
 
 
-### 1. 选项介绍
+### 1. 数据库存储/计算高性能配置
 按照硬件资源CPU、内存、磁盘、网络相关的选项进行介绍
 
 #### 1.1 CPU 高并发相关配置
@@ -76,6 +76,12 @@ __diskIOParallelLevel__
 __maxConnections__
 DolphinDB每个实例，接受用户的连接，来完成用户请求。该选项限制每个实例可接受的最大连接数。
 
+#### 1.5 任务优先级和并发度配置
+上面提到的都是通过配置选项，来给dolphindb系统提供硬件资源支持。同时，dolphindb系统也可以通过函数来设置某个用户执行任务的最大优先级和并行度。
+setMaxJobPriority()
+setMaxJobParallelism()
+优先级范围是0-8，高优先级可以获取更多的执行时间和机会。
+并行度范围是0-64，并行度代表可以并发度，高并行度可以好的利用机器的多核资源，并发执行任务。
 
 __maxConnectionPerSite__
 该实例对外的最大连接数。
@@ -84,29 +90,34 @@ __tcpNoDelay__
 Enable the TCP_NODELAY socket option。可以有效的降低时延。
 
 
-### 2. 流计算高性能配置
+### 2. 流计算模块高性能配置
 流数据作为一个较为独立的功能模块，有些配置选项专门为流计算设计，如果用户对流数据的性能要求高，可以参考如下配置选项。
 
 发布节点配置选项：
 __maxPubConnections__
+发布端能够连接的最大节点数。
 
 __persistenceWorkerNum__
+异步模式下，持久化流数据表到磁盘的线程数。
 
 __maxPersistenceQueueDepth__
+持久化消息队列的最大深度。该队列负责将数据持久化到磁盘。
 
 __maxMsgNumPerBlock__
+发布消息每个block的最大消息条数。消息是以block为整体向subscribe发送。
 
 __maxPubQueueDepthPerSite__
+publish节点的最大消息队列深度。
 
 订阅节点配置选项：
 __subExecutors__
+订阅节点处理收到的流数据的线程数。
 
 __maxSubConnections__
-
-__subExecutorPooling__
+订阅节点可建立订阅连接最大个数。
 
 __maxSubQueueDepth__
-
+订阅节点最大消息队列深度。
 
 
 ### 3. 典型服务器配置实例
