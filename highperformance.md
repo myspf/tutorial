@@ -71,6 +71,9 @@ dfs数据库存储分区数据的位置，如果系统有多个volume，建议�
 __diskIOParallelLevel__  
 磁盘I/O并行参数。
 
+__dfsReplicationFactor__
+数据库副本个数。推荐2
+
 
 #### 1.4 网络 配置
 __maxConnections__  
@@ -121,6 +124,28 @@ __maxSubQueueDepth__
 
 
 ### 3. 典型服务器配置实例
+
+作为数据库，存储计算场景的典型配置：
+单台物理服务配置：24core，48线程；内存256G；磁盘1.8T * 12 volumes
+
+集群设计：
+集群包括1个controller，每台物理机1个agent，以及多个datanode
+datanode个数太少的话，不能充分利用系统并发能力，个数太多的话，管理不方便，而且每个datanode分配的内存就会很少，限制了单datanode的计算能力；也容易造成线程竞争，反而降低了系统的性能。
+一般来说对于一台物理机器，建议datanode个数在4-8之间为宜。本例采用6节点。
+
+内存分配：
+每个数据节点分30G，controller分30G，操作系统以及其他进程保留50G左右；
+
+线程分配：
+共48线程，每个datanode和controller可以设计 8 worker，7 excutor； 这样共需要56线程，考虑到实际中，很少有任务能把系统所有节点都跑满，所以这样设计是合理的。
+
+磁盘分配：
+12个Volumne可以分给不同的数据节点，这样大大提升系统的并行IO读写能力。
+每个数据节点分两个volumn来存储数据，如果系统volume跟节点个数不是倍数关系，可以某个节点少一个volume。
+
+controller.cfg cluster.cfg 参考附录。
+
+作为流数据引擎的典型场景集群配置：
 
 
 
