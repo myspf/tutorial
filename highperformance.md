@@ -31,7 +31,6 @@ dolphindb的采用的是分布式存储技术，也就是说数据会按照分�
 
 
 
-
 ### 1. 数据库存储/计算高性能配置
 按照硬件资源CPU、内存、磁盘、网络相关的选项进行介绍
 
@@ -133,21 +132,27 @@ __maxSubQueueDepth__
 datanode个数太少的话，不能充分利用系统并发能力，个数太多的话，管理不方便，而且每个datanode分配的内存就会很少，限制了单datanode的计算能力；也容易造成线程竞争，反而降低了系统的性能。
 一般来说对于一台物理机器，建议datanode个数在4-8之间为宜。本例采用6节点。
 
-内存分配：
-每个数据节点分30G，controller分30G，操作系统以及其他进程保留50G左右；
+内存设置：
+maxMemSize : 每个数据节点分30G，controller分30G，操作系统以及其他进程保留50G左右；
 
-线程分配：
-共48线程，每个datanode和controller可以设计 8 worker，7 excutor； 这样共需要56线程，考虑到实际中，很少有任务能把系统所有节点都跑满，所以这样设计是合理的。
+线程设置：
+workerNum: 共48线程，每个datanode和controller可以设计 8 worker，这样共需要56线程，考虑到实际中，很少有任务能把系统所有节点都跑满，所以这样设计是合理的。
+localExecutors: 通常来说，localExecutors 设置为 workerNum - 1 位最优，是因为worker接受到任务，分配给exector，worker本身也可以执行该任务。
 
-磁盘分配：
-12个Volumne可以分给不同的数据节点，这样大大提升系统的并行IO读写能力。
-每个数据节点分两个volumn来存储数据，如果系统volume跟节点个数不是倍数关系，可以某个节点少一个volume。
+磁盘设置：
+volumes: 12个Volumne可以分给不同的数据节点，这样大大提升系统的并行IO读写能力。每个数据节点分两个volumn来存储数据，如果系统volume跟节点个数不是倍数关系，可以某个节点少一个volume。
+
+网络设置：
+tcpNoDelay : 设置为true，提高系统相应速度。
+maxConnections : 该节点支持的最大接入进来的连接数，一般根据接入客户端的多少来设置，比如GUI、web、api等都是独立的连接。
+maxConnectionPerSite : 该节点向某个remote节点支持的最大链接数。比如xdb，rpc等都可以向某个remote节点发起连接。
 
 controller.cfg cluster.cfg 参考附录。
 
-作为流数据引擎的典型场景集群配置：
-
-
+作为流数据引擎的典型场景集群配置。
+为了稳定性考虑，一般发布的集群/节点部署在独立的机器上。
+persistenceWorkerNum : 配置物理机器的逻辑线程数；
+maxPersistenceQueueDepth : 
 
 
 ### 4. 性能监控  
