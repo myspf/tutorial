@@ -49,7 +49,7 @@ localExcutor负责执行woker分解的任务。和workNum类似，直接决定�
 相对于上面的两个参数，下面的几个参数不会直接影响性能，只是特定场景下影响系统性能。
  
 __maxBatchJobWorker__  
-batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数提交的任务，通常耗时较长。该参数决定了执行批处理任务的并发度。一般情况下，推荐设置位： xxxx。 
+batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数提交的任务，通常耗时较长。该参数决定了执行批处理任务的并发度。根据系统执行批处理任务的多少群确定。 
 
 注意：如果没有批处理任务，创建的线程会回收，所以并不会占用系统资源。
 
@@ -79,18 +79,18 @@ __dfsReplicationFactor__
 __maxConnections__  
 DolphinDB每个实例，接受用户的连接，来完成用户请求。该选项限制每个实例可接受的最大连接数。
 
+__maxConnectionPerSite__  
+该实例对外的最大连接数。
+ 
+__tcpNoDelay__  
+Enable the TCP_NODELAY socket option。可以有效的降低时延。
+
 #### 1.5 任务优先级和并发度配置
 上面提到的都是通过配置选项，来给dolphindb系统提供硬件资源支持。同时，dolphindb系统也可以通过函数来设置某个用户执行任务的最大优先级和并行度。
 setMaxJobPriority()
 setMaxJobParallelism()
 优先级范围是0-8，高优先级可以获取更多的执行时间和机会。
 并行度范围是0-64，并行度代表可以并发度，高并行度可以好的利用机器的多核资源，并发执行任务。
-
-__maxConnectionPerSite__  
-该实例对外的最大连接数。
- 
-__tcpNoDelay__  
-Enable the TCP_NODELAY socket option。可以有效的降低时延。
 
 
 ### 2. 流计算模块高性能配置
@@ -150,12 +150,21 @@ controller.cfg cluster.cfg 参考附录。
 
 
 
-### 4. 性能监控
-
-1、web 控制器监控cpu、负载、内存、磁盘读写、网络收发等速度；
-
+### 4. 性能监控  
+DolphinDB提供了各种工具来监控集群的性能。 
+1、集群管理器
+集群管理器可以监控到30多个性能指标。比较常用的包括各个节点的 cpu利用率、平均负载、内存使用量、连接数、query查询统计、任务队列深度、磁盘写入速度、磁盘读取速度、网络接收速率、网络发送速率等。
+这些指标也可以通过函数 getClusterPerf() 以table的形式获取到。通过这些监控指标可以反映出整个集群的性能情况。
+比如cpu过高，平均负载过大，说明cpu可能成为集群性能瓶颈；如果磁盘读取基本达到极限，说明IO限制了整体的性能；然后可以再根据上面的指标，对瓶颈点进行配置调优。
 
 2、流数据性能监控
+使用getStreamingStat()函数可以获取到发布端和订阅端的流数据性能指标。该函数返回一个dictionary，包括了对发布和订阅端的性能指标。
+发布端性能指标：
+pubTables : 该节点所有的发布连接，以及每个连接当前发布的 msgOffset，每行代表一个topic(订阅节点，发布节点，订阅表名，订阅action名）。该msgOffset是指该发布表在这个topic的当前发布位置。
+
+pubConns : 与pubTable相似，区别是每行代表一个client端的所有订阅，即这个client在该发布节点订阅的所有表。通过queueDepth可以观察消息的积累程度，如果该值很大，说明发布的队列消息积累严重。可能网络传输慢，发送数据量太大，或者消息被订阅端消费的太慢。
+
+订阅段性能指标：
 
 
 3、用户内存使用性能监控
