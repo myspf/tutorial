@@ -5,7 +5,7 @@ DolphinDB是一个分布式数据库系统，提供了一系列配置选项，�
 机器的硬件资源包括cup、内存、磁盘、网络。这些硬件资源相关相关参数如下：
 * cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker、webWorkerNum
 * 内存：maxMemSize
-* 磁盘：volumes、diskIOParallelLevel
+* 磁盘：volumes、diskIOParallelLevel、dfsReplicationFactor
 * 网络：maxConnections、maxConnectionPerSite、tcpNoDelay
 
 除了硬件资源，操作系统层面也对进程的资源使用进行了限制，比如允许进程打开的最大文件数，这些操作系统层面配置，本文暂不讨论。
