@@ -2,14 +2,14 @@
 
 DolphinDB是一个分布式数据库系统，提供了一系列配置选项，方便用户进行配置，以充分利用机器硬件资源（包括cpu、内存、磁盘、网络）。合理的参数配置，使系统均衡合理的使用这些资源，最大化发挥机器的性能。
 
-机器的硬件资源包括cup、内存、磁盘、网络。这些硬件资源相关相关参数如下：
+机器的硬件资源包括cup、内存、磁盘、网络。DolphinDB提供的相关选项如下：
 * cpu：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker、webWorkerNum
 * 内存：maxMemSize
 * 磁盘：volumes、diskIOParallelLevel、dfsReplicationFactor
 * 网络：maxConnections、maxConnectionPerSite、tcpNoDelay
 
 除了硬件资源，操作系统层面也对进程的资源使用进行了限制，比如允许进程打开的最大文件数，这些操作系统层面配置，本文暂不讨论。
-dao
+
 ### 1. 系统性能综述
 dolphindb是一个功能强大，支持多用户的分布式数据库系统，同时集成了流数据，作业处理，分布式文件系统等功能，支持海量数据的高并发读写，流式计算。整个系统采用多线程架构，数据库文件的存储支持多种类型的分区。dolphindb的架构设计，决定了其在廉价多台pc机，以及高性服务器上都能最大化发挥硬件性能。
 
@@ -18,7 +18,8 @@ dolphindb是一个功能强大，支持多用户的分布式数据库系统，�
 **cpu**决定系统的运算速度，dolphindb每个数据节点都可以做了client，来接受用户请求，进行计算，如果需要远端数据，同时会把任务发给远端的数据节点。在大数据系统里，往往用户的一个任务会被系统分解成非常多的小任务，这些小任务通常都可以并发执行。workernum  和 local excutor来完成任务的分解和执行。因此这两个参数会直接决定系统的并发度。
 同时，dolphindb系统还引入了其他参数，来应对其他的场景，比如http请求并发度，作业任务并发度。
 
-**内存**是现代计算机提升性能的关键，为了充分的利用内存，dolphindb自己管理内存和cache。参数 maxMemSize 决定了节点可用的最大，该参数越大系统的性能越高。当然，如果该参数设置的内存超出操作系统可提供的最大内存，那么会导致dolphidnb被系统kill。
+**内存**  
+是现代计算机提升性能的关键，为了充分的利用内存，dolphindb自己管理内存和cache。参数 maxMemSize 决定了节点可用的最大，该参数越大系统的性能越高。当然，如果该参数设置的内存超出操作系统可提供的最大内存，那么会导致dolphidnb被系统kill。
 
 **磁盘**存储数据文件，数据库系统频繁的从磁盘加载数据，并不定期的写入数据，磁盘I/O往往成为性能的瓶颈，如果多个线程同时访问同一个磁盘volume，那么显而易见，性能会非常糟糕，如果系统有多个volumes，dolphindb也提供了配置选项来同时利用多个volume的读写能力。volomns 指明节点存储数据可以使用的volume，diskIOParallelLevel指定了系统可以并行读写磁盘的能力。
 
