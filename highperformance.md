@@ -166,7 +166,20 @@ persistenceDir : 每个节点设置为一个单独的磁盘卷。这样持久化
 ### 5. 性能监控  
 DolphinDB提供了各种工具来监控集群的性能。 
 #### 5.1 集群管理器
-集群管理器可以监控到30多个性能指标。比较常用的包括各个节点的 cpu利用率、平均负载、内存使用量、连接数、query查询统计、任务队列深度、磁盘写入速度、磁盘读取速度、网络接收速率、网络发送速率等。
+集群管理器可以监控到30多个性能指标。比较常用的包括各个节点的 cpu利用率、平均负载、内存使用量、连接数、query查询统计、任务队列深度、磁盘写入速度、磁盘读取速度、网络接收速率、网络发送速率等。相关指标如下：
+__cpu使用率__   
+CpuUsage、AvgLoad
+__内存监控__  
+MemUsed、MemAlloc、MemLimit
+__磁盘监控__  
+DiskCapacity、DiskFreeSpaceRatio、DiskWriteRate、DiskReadRate、LastMinuteWriteVolume、LastMinuteReadVolume
+__网络监控__  
+networkSendRate、networkRecvRate	lastMinuteNetworkSend	lastMinuteNetworkRecv
+__实时查询性能指标__  
+medLast10QueryTime、maxLast10QueryTime、medLast100QueryTime、maxLast100QueryTime20、maxRunningQueryTime、runningJobs、queuedJobs、runningTasks、queuedTasks、jobLoad
+__实时流数据性能指标__  
+lastMsgLatency、cumMsgLatency
+
 这些指标也可以通过函数 getClusterPerf() 以table的形式获取到。通过这些监控指标可以反映出整个集群的性能情况。
 比如cpu过高，平均负载过大，说明cpu可能成为集群性能瓶颈；如果磁盘读取基本达到极限，说明IO限制了整体的性能；然后可以再根据上面的指标，对瓶颈点进行配置调优。
 
