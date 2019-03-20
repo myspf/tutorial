@@ -95,6 +95,10 @@ __maxPersistenceQueueDepth__
 __maxPubQueueDepthPerSite__  
 publish节点的最大消息队列深度。流表消息发布的方式是，针对某个remote节点，建立一个消息发布队列，该队列中的消息发送到某个remote节点。该选项指明，该发布节点针对某个remote节点的消息发布队列的最大深度。默认值为10000000。
 
+> 发布表的持久化函数 enableTablePersistence(table, [asynWrite=true], [compress=true], [cacheSize=-1]) 中几个参数的合理设置，对性能影响很大。
+asynWrite : 是否异步持久化，显然异步持久化会大大提升系统性能，代价是宕机的时候，可能会造成最后一个消息丢失。可容忍的场景下，建议设为true。
+compress : 持久化到磁盘的数据是否压缩。如果压缩，那数据量很降低很多，同时减少磁盘写入量，提升性能，但压缩解压有一定代价，总体来看，建议设为true。
+cacheSize : 流表中保存在内存中数据的最大条数，越大的话，对实时查询，订阅都有性能提升。根据物理机内存总量，合理分配。建议大于1000000。
 
 订阅节点配置选项：
 __subExecutors__  
@@ -106,11 +110,16 @@ __maxSubConnections__
 __maxSubQueueDepth__  
 订阅节点上最大的每个订阅线程最大的可接收消息的队列深度。订阅的消息，会先放入订阅消息队列，该值指明该队列的大小。默认设置为10000000。
 
+> 订阅函数 subscribeTable([server], tableName, [actionName], [offset=-1], handler, [msgAsTable=false], [batchSize=0], [throttle=1], [hash=-1])，有几个参数对性能影响很大。
+batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。
+throttle : 触发handler处理消息的时间（秒）阈值。如果batchSize也设置，那么哪个先满足条件，都会触发handler计算。
+handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。
+
 ### 4. 典型服务器配置实例
 #### 4.1 分布式时序数据库配置
   单台物理服务配置：24core，48线程；内存256G；磁盘1.8T * 12 volumes
 
-> 集群设计  
++ 集群设计  
 集群包括1个controller，每台物理机1个agent，以及多个datanode。
 datanode个数太少的话，不能充分利用系统并发能力，个数太多的话，管理不方便，而且每个datanode分配的内存就会很少，限制了单datanode的计算能力；也容易造成线程竞争，反而降低了系统的性能。一般来说对于一台物理机器，建议datanode个数在4-8之间为宜。本例采用6节点。
 这样集群包括1个controller，1个agent，6个datanode。
