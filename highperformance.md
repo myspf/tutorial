@@ -170,7 +170,7 @@ DolphinDB提供了各种工具来监控集群的性能。
 
 __cpu使用率__  : CpuUsage、AvgLoad
 
-__内存监控__   : MemUsed、MemAlloc、MemLimit
+**内存监控**   : MemUsed、MemAlloc、MemLimit
 
 __磁盘监控__   : DiskCapacity、DiskFreeSpaceRatio、DiskWriteRate、DiskReadRate、LastMinuteWriteVolume、LastMinuteReadVolume
 
