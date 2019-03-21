@@ -198,13 +198,10 @@ subWorkers : 每个subWorker处理消息的统计信息。subWorker的个数由�
 
 函数getSessionMemoryStat()返回该节点的不同用户的内存使用总量。如果碰到内存超限，可以使用该函数，排查哪个用户占用过多内存。
 
+<!--`<u>__*注意__ : 订阅函数 subscribeTable([server], tableName, [actionName], [offset=-1], handler, [msgAsTable=false], [batchSize=0], [throttle=1], [hash=-1])，有几个参数对性能影响很大。*</u>`-->
 
-
-
-<u>__*注意__ : 订阅函数 subscribeTable([server], tableName, [actionName], [offset=-1], handler, [msgAsTable=false], [batchSize=0], [throttle=1], [hash=-1])，有几个参数对性能影响很大。*</u>
-
-<u>*batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。  
+<!--`<u>*batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。  
 throttle : 触发handler处理消息的时间（秒）阈值。如果batchSize也设置，那么哪个先满足条件，都会触发handler计算。  
-handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。*</u>
+handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。*</u>`-->
 
 ### 
