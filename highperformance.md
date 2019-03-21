@@ -74,7 +74,7 @@ __tcpNoDelay__ : 使能TCP的 TCP_NODELAY 选项，可以有效的降低请求�
 __setMaxJobPriority__ : 优先级范围是0-8，高优先级可以获取更多的执行时间和机会。  
 __setMaxJobParallelism__ : 并行度范围是0-64，并行度代表可以并发度，高并行度可以好的利用机器的多核资源，并发执行任务。  
 
-__*注意__ : 数据库的分区设计对查询的性能影响很大。分区过大，会造成并行加载容易出现内存不足，从而造成操作系统频繁对内存和磁盘进行数据交换，大大降低降低性能。分区过小，造成系统中存在大量的子任务，导致节点间存在大量的通信和调度，并且还会频繁的访问磁盘的小文件，也会明显降低性能。关于分区的大小以及详细的设计，请参考教程  [https://github.com/dolphindb/Tutorials_CN/blob/master/database.md*]()
+__注意__ : 数据库的分区设计对查询的性能影响很大。分区过大，会造成并行加载容易出现内存不足，从而造成操作系统频繁对内存和磁盘进行数据交换，大大降低降低性能。分区过小，造成系统中存在大量的子任务，导致节点间存在大量的通信和调度，并且还会频繁的访问磁盘的小文件，也会明显降低性能。关于分区的大小以及详细的设计，请参考教程  [https://github.com/dolphindb/Tutorials_CN/blob/master/database.md]() 
 
 ### 3. 流计算模块高性能配置  
 
@@ -93,11 +93,11 @@ __maxPubQueueDepthPerSite__ : publish节点的最大消息队列深度。流表�
 
 __maxPubConnections__ : 发布端能够连接的最大节点数。一个订阅节点对该发布节点的订阅，为１个发布连接，该选项指定能够订阅该发布节点上表的最大订阅节点的个数。例如设置为８，则最多有８个订阅节点来订阅该发布节点上的流表。
 
-__*注意__ : 发布表的持久化函数 enableTablePersistence(table, [asynWrite=true], [compress=true], [cacheSize=-1]) 中几个参数的合理设置，对性能影响很大。*  
+__注意__ : 发布表的持久化函数 enableTablePersistence(table, [asynWrite=true], [compress=true], [cacheSize=-1]) 中几个参数的合理设置，对性能影响很大。
 
-> *asynWrite : 是否异步持久化，显然异步持久化会大大提升系统性能，代价是宕机的时候，可能会造成最后几条消息丢失。可容忍的场景下，建议设为true。  
-> compress : 持久化到磁盘的数据是否压缩。如果压缩，那数据量很降低很多，同时减少磁盘写入量，提升性能，但压缩解压有一定代价，建议设为true。  
-> cacheSize : 流表中保存在内存中数据的最大条数，越大的话，对实时查询，订阅都有性能提升。根据物理机内存总量，合理分配。建议大于1000000。*
+asynWrite : 是否异步持久化，显然异步持久化会大大提升系统性能，代价是宕机的时候，可能会造成最后几条消息丢失。可容忍的场景下，建议设为true。  
+compress : 持久化到磁盘的数据是否压缩。如果压缩，那数据量很降低很多，同时减少磁盘写入量，提升性能，但压缩解压有一定代价，建议设为true。  
+cacheSize : 流表中保存在内存中数据的最大条数，越大的话，对实时查询，订阅都有性能提升。根据物理机内存总量，合理分配。建议大于1000000。
 
 #### 3.2 订阅节点配置选项
 
@@ -107,11 +107,11 @@ __maxSubQueueDepth__ : 订阅节点上最大的每个订阅线程最大的可接
 
 __maxSubConnections__ : 订阅节点的最大订阅连接数。如果一个节点订阅同一个发布节点上的多张流表，那么这些流表共享一个连接。所以，一个订阅DolphinDB节点、API订阅应用等都是一个订阅连接
 
-__*注意__ : 订阅函数 subscribeTable([server], tableName, [actionName], [offset=-1], handler, [msgAsTable=false], [batchSize=0], [throttle=1], [hash=-1])，有几个参数对性能影响很大。*  
+__注意__ : 订阅函数 subscribeTable([server], tableName, [actionName], [offset=-1], handler, [msgAsTable=false], [batchSize=0], [throttle=1], [hash=-1])，有几个参数对性能影响很大。
 
-> *batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。  
-> throttle : 触发handler处理消息的时间（秒）阈值。如果batchSize也设置，那么哪个先满足条件，都会触发handler计算。  
-> handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。*
+batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。  
+throttle : 触发handler处理消息的时间（秒）阈值。如果batchSize也设置，那么哪个先满足条件，都会触发handler计算。  
+handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。
 
 ### 4. 典型服务器配置实例
 
