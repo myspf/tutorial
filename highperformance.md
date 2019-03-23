@@ -37,9 +37,8 @@ DolphinDB架构采用多线程技术，合理的并发度能极大提升系统�
 
 __workerNum__  : woker负责接收客户端请求，分解任务，根据任务粒度自己执行或者交给excutor执行。该参数直接决定了系统的并发数，根据物理机器上逻辑线程数，以及该物理机器bak的DolphinDB数据节点个数设置。
 
-__localExecutors__ : localExcutor负责执行woker分解的任务。和workNum类似，直接决定了系统的并发度，推荐设置为 workerNum - 1。
+__localExecutors__ : localExcutor负责执行woker分解的任务。和workNum类似，直接决定了系统的并发度，推荐设置为 workerNum - 1。  
 
-下面的选项是特定场景下需要配置的选项。
 __maxBatchJobWorker__  : batchJob Worker 执行批处理任务，这些任务是指通过submitJob函数提交的任务，通常耗时较长。该参数决定了执行批处理任务的并发度。根据系统执行批处理任务的多少群确定。 
 注意：如果没有批处理任务，创建的线程会回收，所以并不会占用系统资源。
 
