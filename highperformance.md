@@ -9,7 +9,7 @@ DolphinDB提供了很多选项来配置集群使用的硬件能力，比如计�
 - 磁盘：volumes、diskIOParallelLevel、dfsReplicationFactor、persistenceDir
 - 网络：maxConnections、maxPubConnections、_maxSubConnections、maxConnectionPerSite、tcpNoDelay
 
-除了硬件资源，操作系统层面也对进程的资源使用进行了限制，比如允许进程打开的最大文件数，这些操作系统层面配置，本文暂不讨论。
+除了硬件资源，操作系统层面也对进程的资源使用进行了限制，比如允许进程打开的最大文件数，这些操作系统层面配置，本文暂不讨论。DolphinDB集群的搭建请参考教程 [https://github.com/dolphindb/Tutorials_EN/blob/master/single_machine_cluster_deploy.md]()
 
 ### 1. 系统性能综述
 
@@ -91,9 +91,9 @@ __maxPubQueueDepthPerSite__ : 最大消息发布队列深度。针对某个订�
 __maxPubConnections__ : 最大的发布-订阅连接数。一个订阅节点和一个发布节点之间（可能订阅该节点的多张流表）建立1个发布-订阅连接。该选项指定能够订阅该发布节点上表的最大订阅节点的个数。例如设置为８，则最多有８个订阅节点来订阅该发布节点上的流表。
 
 > __注意__ : 发布表的持久化函数 enableTablePersistence(table, [asynWrite=true], [compress=true], [cacheSize=-1]) 中几个参数的合理设置，对性能影响很大。
-asynWrite : 流数据是否异步持久化，显然异步持久化会大大提升系统性能，代价是宕机的时候，可能会造成最后几条消息丢失。可容忍的场景下，建议设为true。  
-compress : 持久化到磁盘的数据是否压缩。如果压缩，数据量很降低很多，同时减少磁盘写入量，提升性能，但压缩解压有一定代价，建议设为true。  
-cacheSize : 流表中保存在内存中数据的最大条数，越大的话，对实时查询，订阅都有性能提升。根据物理机内存总量，合理分配。建议大于1000000。
+> asynWrite : 流数据是否异步持久化，显然异步持久化会大大提升系统性能，代价是宕机的时候，可能会造成最后几条消息丢失。可容忍的场景下，建议设为true。  
+> compress : 持久化到磁盘的数据是否压缩。如果压缩，数据量很降低很多，同时减少磁盘写入量，提升性能，但压缩解压有一定代价，建议设为true。  
+> cacheSize : 流表中保存在内存中数据的最大条数，越大的话，对实时查询，订阅都有性能提升。根据物理机内存总量，合理分配。建议大于1000000。
 
 #### 3.2 订阅节点配置选项
 
@@ -104,9 +104,9 @@ __maxSubQueueDepth__ : 订阅节点上最大的每个订阅线程最大的可接
 __maxSubConnections__ : 订阅节点的最大订阅连接数。如果一个节点订阅同一个发布节点上的多张流表，那么这些流表共享一个连接。所以，一个订阅DolphinDB节点、API订阅应用等都是一个订阅连接。默认为 64.
 
 > __注意__ : 订阅函数 subscribeTable([server], tableName, [actionName], [offset=-1], handler, [msgAsTable=false], [batchSize=0], [throttle=1], [hash=-1])，有几个参数对性能影响很大。
-batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。  
-throttle : 触发handler处理消息的时间（秒）阈值。如果batchSize也设置，那么哪个先满足条件，都会触发handler计算。  
-handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。
+> batchSize : 触发handler处理消息的累计消息量（行数）阈值。根据流数据的频率，建议设置该值，批处理会很大的提升性能。  
+> throttle : 触发handler处理消息的时间（秒）阈值。如果batchSize也设置，那么哪个先满足条件，都会触发handler计算。  
+> handler : 处理流数据的函数。该函数里面应该高度优化，尽量采用向量化编程。因为会多次调用，整体性能影响很大。
 
 ### 4. 典型服务器配置实例
 
