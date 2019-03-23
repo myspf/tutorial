@@ -2,12 +2,12 @@
 
 DolphinDB是一个分布式数据库系统，提供了一系列配置选项，方便用户进行配置，以充分利用机器硬件资源（包括CPU、内存、磁盘、网络）。合理的参数配置，使系统均衡合理的使用这些资源，最大化发挥机器的性能。
 
-机器的硬件资源包括cup、内存、磁盘、网络。DolphinDB提供的相关选项如下： 
+DolphinDB提供了很多选项来配置集群使用的硬件能力，比如计算能力的最大并发度、可使用内存的最大量、最大网络链接数、流数据发送队列的最大深度等，从硬件能力的角度分类，所有选项如下：
 
-- CPU：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker、webWorkerNum、persistenceWorkerNum
-- 内存：maxMemSize
+- CPU：workerNum、localExecutors、maxBatchJobWorker、maxDynamicWorker、webWorkerNum、persistenceWorkerNum、subExecutors
+- 内存：maxMemSize、maxPersistenceQueueDepth、maxPubQueueDepthPerSite、maxSubQueueDepth
 - 磁盘：volumes、diskIOParallelLevel、dfsReplicationFactor、persistenceDir
-- 网络：maxConnections、maxConnectionPerSite、tcpNoDelay
+- 网络：maxConnections、maxPubConnections、_maxSubConnections、maxConnectionPerSite、tcpNoDelay
 
 除了硬件资源，操作系统层面也对进程的资源使用进行了限制，比如允许进程打开的最大文件数，这些操作系统层面配置，本文暂不讨论。
 
@@ -16,9 +16,9 @@ DolphinDB是一个分布式数据库系统，提供了一系列配置选项，�
 DolphinDB 是一个功能强大，支持多用户的分布式数据库系统，同时集成了流数据，作业处理，分布式文件系统等功能，支持海量数据的高并发读写，流式计算。整个系统采用多线程架构，数据库文件的存储支持多种类型的分区。DolphinDB提供了很多选项来合理化配置集群，以最大化发挥机器的性能。DolphinDB选项和和硬件资源关系概述如下：
 
 **CPU**  为系统提供计算能力，DolphinDB 每个数据节点都可以做为客户端，来接受用户请求，进行计算，如果需要远端数据，同时会把任务发给远端的数据节点。在大数据系统里，往往用户的一个任务会被系统分解成非常多的小任务，这些小任务通常都可以并发执行。 **workerNum** 和 **localExecutors** 来完成任务的分解和执行。因此这两个参数会直接决定系统的并发度。
-同时，还引入了其他参数配置其他的场景，比如http请求并发度 **webWorkerNum** ，作业任务并发度 **maxBatchJobWorker** 。针对流数据场景还配置了 **persistenceWorkerNum**, **subExecutors** 等。
+同时，还引入了其他参数配置其他的场景，比如http请求并发度 **webWorkerNum** ，作业任务并发度 **maxBatchJobWorker** 。针对流数据场景还配置了 **persistenceWorkerNum**, **subExecutors** 来配置发布和订阅的并发能力。
 
-__内存__  是现代计算机提升性能的关键，为了充分的利用内存，DolphinDB自己管理内存和cache。参数 __maxMemSize__ 指明了节点可用的最大内存，该参数越大系统的性能越高。当然，如果该参数设置的内存超出操作系统可提供的最大内存，那么会导致DolphinDB被操作系统杀死。
+__内存__  是现代计算机提升性能的关键，为了充分的利用内存，DolphinDB自己管理内存和cache。参数 __maxMemSize__ 指明了节点可用的最大内存，该参数越大系统的性能越高。当然，如果该参数设置的内存超出操作系统可提供的最大内存，那么会导致DolphinDB被操作系统杀死。DolphinDB提供了很多队列深度相关选项，这些选项结合节点最大可用内存量(**maxMemSize**)来配置，配置的过大，可能超出系统提供的内存范围，配置过小，会限制系统的整体性能。
 
 __磁盘__  存储数据文件，数据库系统频繁的从磁盘加载数据，并不定期的写入数据，磁盘I/O往往成为性能的瓶颈，如果多个线程同时访问同一个磁盘卷，那么显而易见，性能会非常糟糕，如果系统有多个磁盘卷，DolphinDB也提供了配置选项来同时利用多个磁盘的读写能力。选项 __volumes__ 指明节点存储数据表可以使用的磁盘卷， __diskIOParallelLevel__ 指定了系统可以并行读写磁盘的能力。
 对流数据的持久化，选项 __persistenceDir__ 指定流数据的持久化目录，如果系统中有多个节点作为流数据发布中心，该选项可以设置为不同的磁盘卷。以增加系统并发写入能力。
@@ -47,6 +47,11 @@ __maxDynamicWorker__ : dynamic worker作为上面介绍的worker的补充，当�
 
 __webWorkerNum__ : web worker处理http请求，表示处理http请求的线程数目。web的连接可以通过集群管理器界面，连接到某个节点的notebook进行交互式操作。
 
+上面的选项针对系统的整体并发计算能力。同时，DolphinDB也提供了通过函数来设置某个用户执行任务的最大优先级和并行度，具有较高由优先级的任务会有更多的机会和资源执行，从应用的层面来提高某些任务的计算并发度和优先级。
+
+__setMaxJobPriority__ : 优先级范围是0-8，高优先级可以获取更多的执行时间和机会。任务的默认优先级为 4。
+__setMaxJobParallelism__ : 并行度范围是0-64，并行度代表可以并发度，高并行度可以好的利用机器的多核资源，并发执行任务。任务的并行度默认位2。
+
 #### 2.2 内存配置选项
 
 __maxMemSize__ : DolphinDB 实例使用的最大内存量，应该根据系统实际的物理内存，以及节点的个数来合理的设置该值。设置的越大，性能以及系统的处理能力越大，但如果设置值超粗了系统提供的内存大小，则有可能会被操作系统杀掉。比如操作系统实际的物理内存是16G，该选项设置为32G，那么运行过程中，有可能被操作系统默默杀掉。
@@ -66,13 +71,6 @@ __maxConnections__ : 可接受的最大连接数。DolphinDB每个实例，收�
 __maxConnectionPerSite__ : 对外某一个节点的最大连接数。DolphinDB数据是分布式存储的，每个节点需要和其他节点进行连接通信，该选项指明该节点能连接和任一节点能建立的最大连接数。默认是 localExecutors + workerNum + webWorkerNum ，推荐使用默认设置。
 
 __tcpNoDelay__ : 使能TCP的 TCP_NODELAY 选项，可以有效的降低请求的时延。推荐设置为true。
-
-#### 2.5 任务优先级和并发度配置  
-
-上面提到的都是通过配置选项，给DolphinDB系统提供硬件资源支持。同时，系统也可以通过函数来设置某个用户执行任务的最大优先级和并行度，具有较高由优先级的任务会有更多的机会和资源执行。 
-
-__setMaxJobPriority__ : 优先级范围是0-8，高优先级可以获取更多的执行时间和机会。任务的默认优先级为 4。
-__setMaxJobParallelism__ : 并行度范围是0-64，并行度代表可以并发度，高并行度可以好的利用机器的多核资源，并发执行任务。任务的并行度默认位2。
 
 > __注意__ : 数据库的分区设计对查询的性能影响很大。分区过大，会造成并行加载容易出现内存不足，从而造成操作系统频繁对内存和磁盘进行数据交换，大大降低降低性能。分区过小，造成系统中存在大量的子任务，导致节点间产生大量的通信和调度，并且还会频繁的访问磁盘的小文件，也会明显降低性能。关于分区的大小以及详细的设计，请参考教程  [https://github.com/dolphindb/Tutorials_CN/blob/master/database.md]()
 
