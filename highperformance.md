@@ -110,13 +110,14 @@ __maxSubConnections__ : 订阅节点的最大订阅连接数。如果一个节�
 
 ### 4. 日志相关配置选项
 
-DolphinDB 系统记录多种类型的日志，有节点运行情况的日志，数据库元数据日志，redoLog的日志，查询query的性能日志。为了确保系统在异常情况（比如断电等）下的数据安全，有些日志必须同步确保已经持久化到磁盘上。而监控类日志，则不需要严格同步。具体设置建议如下：
-__dfsMetaDir__ : 控制节点元数据存储目录，建议设置到`ssd`磁盘上，在controller.cfg里面设置。
-__chunkMetadir__ : 数据节点元数据存储目录，建议设置到ssd磁盘上，在cluster.cfg里面设置。
-__rodoLogDir__ : redo log的存储目录，为了防止掉电后数据丢失，在写数据库前，先写redo log。建议设置到ssd磁盘上，在cluster.cfg里面设置。
-__logFile__ : 各个节点的运行日志，记录节点的运行状态、错误信息等，可以写到hdd磁盘上。controller.cfg、agent.cfg、cluster.cfg中设置。
-__jobLogFile__ : 各个节点的query 日志，记录各个query的执行情况，可以写到hdd磁盘上。cluster.cfg中设置。
-__persistenceDir__ : 流数据的存储路径，建议设置到ssd磁盘上。在cluter.cfg中设置。
+DolphinDB 系统记录多种类型的日志，有节点运行情况的日志，数据库元数据日志，redoLog的日志，查询query的性能日志。为了确保系统在异常情况（比如断电等）下的数据安全，有些日志必须同步确保已经持久化到磁盘上。而监控类日志，则不需要严格同步。具体设置建议如下：  
+__dfsMetaDir__ : 控制节点元数据存储目录，建议设置到`ssd`磁盘上，在controller.cfg里面设置。 
+
+__chunkMetadir__ : 数据节点元数据存储目录，建议设置到ssd磁盘上，在cluster.cfg里面设置。  
+__rodoLogDir__ : redo log的存储目录，为了防止掉电后数据丢失，在写数据库前，先写redo log。建议设置到ssd磁盘上，在cluster.cfg里面设置。  
+__logFile__ : 各个节点的运行日志，记录节点的运行状态、错误信息等，可以写到hdd磁盘上。controller.cfg、agent.cfg、cluster.cfg中设置。  
+__jobLogFile__ : 各个节点的query 日志，记录各个query的执行情况，可以写到hdd磁盘上。cluster.cfg中设置。  
+__persistenceDir__ : 流数据的存储路径，建议设置到ssd磁盘上。在cluter.cfg中设置。  
 
 
 ### 4. 典型服务器配置实例
