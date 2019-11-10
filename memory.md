@@ -1,26 +1,33 @@
 # DolphinDB 内存管理
 
-DolphinDB为了最大化性能，自己管理内存，DolphinDB的内存管理包括以下特点：
+DolphinDB提供多用户并发操作，为了最大化性能，自己管理内存，DolphinDB的内存管理包括以下特点：
 * 用户无须关注内存，为用户提供局部变量提供内存管理
 * 提供分布式数据库的缓存，最大化性能
 * 为发布节点提供流数据队列，以缓存发布消息
 * 为订阅节点提供流数据队列，以缓存订阅消息
 
-## 1. 下载
+## 1. 概述
 
-从DolphindB网站下载DolphinDB，并解压到一个指定目录。例如解压到如下目录：
-
-```sh
-/DolphinDB
+DolphinDB server提供多用户同时并发访问，DolphinDB提供了session机制，来为每个用户创建一个编程环境，比如user1 创建表t，user2也创建同名表t，显然两个用户的表t虽然同名，确是完全独立的，底层在内存分上也是独立的。
+DolphinDB提供了函数 getSessionMemoryStat()，来查看每个用户所占用的内存大小。也提供了全局函数mem(true) 来查看server上的整体内存使用情况。
 ```
-
-## 2. 软件授权许可更新
-
-如果用户拿到了企业版试用授权许可，只需用其把替换如下授权许可文件即可。每个物理节点的授权许可文件都需要更新。与社区版本相比，企业版支持更多的节点，CPU内核和内存。
-
-```sh
-/DolphinDB/server/dolphindb.lic
+getSessionMemoryStat()
+mem(true)
 ```
+后续使用这两个函数查看内存变化。
+
+## 2. 单用户内存管理
+
+如下用户创建vector变量，1亿个int类型，约400兆。
+```
+v = 1..100000000
+```
+通过函数mem查看server端的内存占用情况
+```
+sum(mem().blockSize - mem().freeSize) 
+```
+结果为: 402,865,056，符合预期
+
 
 ## 3. DolphinDB集群初始配置
 
