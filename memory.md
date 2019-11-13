@@ -65,12 +65,12 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 login(`admin,`123456)
 getSessionMemoryStat()
 ```
-    | userId        | sessionId    |  memSize  |
-    | --------   | -----:   | :----: |
-    | admin        | 3,951,472,048      |   16    |
-    | user1        | 4,203,157,148      |   612,369,840   |
-    | user1        | 1,769,725,800      |   612,369,840    |
-
+  | userId        | sessionId    |  memSize  |
+  |-------- |-----------|----------|
+  | admin        | 3,951,472,048      |   16    |
+  | user1        | 4,203,157,148      |   612,369,840   |
+  | user1        | 1,769,725,800      |   612,369,840    |
+    
 
 
 创建同样有1亿长度的vector v，查看内存结果为：805,525,536。
