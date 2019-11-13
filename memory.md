@@ -49,8 +49,30 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 结果为：612,530,448，约600兆，符合预期。
 
 ### 2.2 单用户不同session创建私有变量
-DolphinDB提供不同session间的内存隔离。即使同一用户，在不同的session中创建同名变量，内存空间占用也是完全独立的。
-再新建一个session（打开另一个GUI），用另外的用户名登录
+DolphinDB提供不同session间的内存隔离。即使同一用户，在不同的session中创建同名变量，内存空间占用也是完全独立的。  
+再新建一个session（打开另一个GUI），同样用user1登陆，创建同名的vector以及table。代码如下：  
+```
+login("user1","123456")
+v = 1..100000000
+n = 10000000
+t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
+(mem().blockSize - mem().freeSize).sum()
+```
+结果为 ：1224926000，占用内存约1.2G。
+
+在另外一个session上登陆，用函数getSessionMemoryStat()查看sesion的内存，如下：
+```
+login(`admin,`123456)
+getSessionMemoryStat()
+```
+    | userId        | sessionId    |  memSize  |
+    | --------   | -----:   | :----: |
+    | admin        | 3,951,472,048      |   16    |
+    | user1        | 4,203,157,148      |   612,369,840   |
+    | user1        | 1,769,725,800      |   612,369,840    |
+
+
+
 创建同样有1亿长度的vector v，查看内存结果为：805,525,536。
 说明虽然系统有两个同名变量，但是属于不同的session，因此内存是完全独立的。
 
