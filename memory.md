@@ -68,11 +68,6 @@ login(`admin,`123456)
 getSessionMemoryStat()
 ```
 输出如下：
-  | userId        | sessionId    |  memSize  |  
-  | -------- |-----------|----------|   
-  | admin        | 4,203,157,148      |   612,369,840   |  
-  | user1        | 1,769,725,800      |   612,369,840    |  
-  
   userId|sessionId|memSize
   ---|:--:|---:
   admin| 4,203,157,148 | 612,369,840
@@ -112,10 +107,31 @@ sum(mem().blockSize - mem().freeSize)
 * 必要的时候，对缓存数据进行自动回收；
 
 下面我们通过一个具体的实例介绍以上特点。搭建的集群采用2个节点，单副本模式，按天分30个区，每个分区1000万行，10列（1列为timestamp类型，9列为LONG类型），所以每个分区的每列 1000万行 * 8字节/列 = 80M，每个分区共1000 万行 * 80字节/行 = 800M，整个表共3亿行，大小为24GB。
->函数clearAllCache() 可以情况已经缓存的数据。
+>函数clearAllCache() 可以情况已经缓存的数据，下面的每次测试前，先用该函数清空节点上的所有缓存。
 
 ### 3.1 内存以分区为单位进行管理
 DolphinDB是列式存，当用户对分布式表的数据进行查询时，加载数据的原则是，只把用户所要求的分区和列加载到内存中。而且，除非用户取数据（比如用t = select ..），那么数据只会加载到所在的节点上，不会传输到其他节点。
+示例1 在node1 上加载 1个分区（2019.01.01，该分区在）的一列数据tag1，该分区储存在node1上，可以在controller上通过函数getClusterChunksStatus()查看分区分布情况。
+```
+select max(tag1) from loadTable(dbName,tableName) where date = 2019.01.01
+sum(mem().blockSize - mem().freeSize) 
+```
+输出结果为：168,000,992。上面的select需要两列数据，分区deta和tag1，按照上面的计算每列80M，两列160M左右符合预期。
+
+示例2 在node1 上查询 2019.01.01的所有数据，并观察内存占用
+```
+select * from loadTable(dbName,tableName) where date = 2019.01.01
+sum(mem().blockSize - mem().freeSize)
+```
+输出结果为： 839,101,024，按照上面计算，每个分区800M，结果符合预期。
+
+示例3 在node2 上查询 存储在node1上的分区数据 2019.01.01。GUI上连接node2，然后执行查询
+```
+select max(tag1),min(tag2) from loadTable(dbName,tableName) where date = 2019.01.01
+sum(mem().blockSize - mem().freeSize) 
+```
+输出结果为： 193504。由于分区存储在node1上，虽然通过node2查询，但是数据仍然只加载到node1的内存。所以node2上内存显示很小。这时到node1上查看内存占用结果为 251,905,744，共3列数据，结果符合预期。
+
 
 
 
