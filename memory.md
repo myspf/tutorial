@@ -68,10 +68,10 @@ login(`admin,`123456)
 getSessionMemoryStat()
 ```
 输出如下：
-  | userId        | sessionId    |  memSize  |
-  | -------- |-----------|----------|
-  | admin        | 4,203,157,148      |   612,369,840   |
-  | user1        | 1,769,725,800      |   612,369,840    |
+  | userId        | sessionId    |  memSize  |  
+  | -------- |-----------|----------|   
+  | admin        | 4,203,157,148      |   612,369,840   |  
+  | user1        | 1,769,725,800      |   612,369,840    |  
 
 由上可知，sever内存共占用1.2G，在两个session中。大家可能会有疑问，这个session也是用user1登录，创建的变量，为什么admin用户占用600兆。原因是，查看内存，执行getSessionMemoryStat()函数前，我们用admin登录了（只有admin用户有执行该函数的权限），因此该session当前的user为admin而非user1。
   
