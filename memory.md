@@ -103,7 +103,7 @@ sum(mem().blockSize - mem().freeSize)
 
 * 内存是以分区为单位进行管理；
 * 同一分区，内存只保留一份数据；
-* 尽量多缓存加载过的数据；
+* 内存允许情况下，尽量多缓存数据；
 * 必要的时候，对缓存数据进行自动回收；
 
 下面我们通过一个具体的实例介绍以上特点。搭建的集群采用2个节点，单副本模式，按天分30个区，每个分区1000万行，10列（1列为timestamp类型，9列为LONG类型），所以每个分区的每列 1000万行 * 8字节/列 = 80M，每个分区共1000 万行 * 80字节/行 = 800M，整个表共3亿行，大小为24GB。
@@ -130,7 +130,33 @@ sum(mem().blockSize - mem().freeSize)
 select max(tag1),min(tag2) from loadTable(dbName,tableName) where date = 2019.01.01
 sum(mem().blockSize - mem().freeSize) 
 ```
-输出结果为： 193504。由于分区存储在node1上，虽然通过node2查询，但是数据仍然只加载到node1的内存。所以node2上内存显示很小。这时到node1上查看内存占用结果为 251,905,744，共3列数据，结果符合预期。
+输出结果为： 193504。由于分区存储在node1上，虽然通过node2查询，但是数据仍然只加载到node1的内存。所以node2上内存显示很小。这时到node1上查看内存占用结果为 251,905,744，共3列数据，结果符合预期。  
+所以在数据分区设计的时候，合理考虑分区大小以及分区间数据量尽量相近尤为关键。
+
+### 3.2 内存中只保留数据的一份副本
+DolphinDB支持海量数据的并发查询，为了高效利用内存，对相同分区的数据，内存中只保留一份数据。
+示例4 打开两个GUI，分别登陆连接node1和node2，查询分区2019.01.01的数据。
+```
+select * from loadTable(dbName,tableName) where date = 2019.01.01
+sum(mem().blockSize - mem().freeSize)
+```
+上面的代码不管执行几次，node1上内存显示一直是 839,101,024，而node2上无内存占用。因为分区数据只存储在node1上，所以node1会加载所有数据，而node2不占用任何内存。
+
+### 3.3 内存允许情况下，尽量多缓存数据
+通常情况下，最近访问的数据往往更容易再次被访问，因此DolphinDB在内存允许的情况下（内存占用不超过用户设置的maxMemSize），尽量多缓存数据，来提升后续数据的访问效率。
+示例5：在node1 上先加载2019.01.01的分区数据，查看内存
+```
+select * from loadTable(dbName,tableName) where date = 2019.01.01
+sum(mem().blockSize - mem().freeSize)
+```
+输出结果为：839118272。再查询 2019.01.03的数据，该分区也存储在node1上，
+```
+select * from loadTable(dbName,tableName) where date = 2019.01.03
+sum(mem().blockSize - mem().freeSize)
+```
+输出结果为：1,678,002,080。共1.6G，包含两个分区的数据，之前分区的数据仍然在内存中保留。
+
+### 3.4 必要的时候，对缓存数据进行自动回收
 
 
 
