@@ -178,7 +178,7 @@ sum(mem().blockSize - mem().freeSize)
 
 ## 4 作为流数据消息缓存队列
 
-!(https://github.com/myspf/tutorial/blob/master/streaming.png)
+!(https://github.com/myspf/tutorial/blob/master/streaming.png?raw=true)
 
 
 ## 5 内存常用函数（包括监控，清理内存）
