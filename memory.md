@@ -1,6 +1,9 @@
 # DolphinDB 内存管理
 
 
+| userId | sessionId | memSize |
+| :------| ------: | :------: |
+
 DolphinDB是一款提供多用户并发读写的分布式数据库软件，其中高效的内存管理是其性能优异的基础，DolphinDB内存管理包括以下功能：
 
 * __Session变量内存管理__ ，为用户提供和回收编程环境所需内存，隔离Session间的内存空间； 
