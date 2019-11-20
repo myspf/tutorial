@@ -82,10 +82,10 @@ login(`admin,`123456)
 getSessionMemoryStat()
 ```
 输出如下：  
-| userId | sessionId | memSize |
-| :------| ------: | :------: |
-| admin | 4,203,157,148 | 612,369,840 |
-| user1 | 1,769,725,800 | 612,369,840 |
+| userId | sessionId | memSize |  
+| :------| ------: | :------: |  
+| admin | 4,203,157,148 | 612,369,840 |  
+| user1 | 1,769,725,800 | 612,369,840 |  
 
 由上可知，sevver内存共占用1.2G，在两个Session中。当前第一个Session中登陆了usr1用户，第二个Session中登陆了admin用户。内存空间完全隔离。
   
