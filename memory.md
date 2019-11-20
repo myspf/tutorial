@@ -178,7 +178,7 @@ sum(mem().blockSize - mem().freeSize)
 ## 4 作为流数据消息缓存队列
 当数据进入流数据系统时，首先写入流表，然后写入持久化队列和发送队列（假设用户设置为异步持久化），持久化队列异步写入磁盘，发送队列发送到订阅端。  
 当订阅端收到数据后，先放入接受队列，然后用户定义的handler从接收队列中取数据并处理。如果handler处理缓慢，会导致接收队列有数据堆积，占用内存。如下图所示：
-![image](https://github.com/myspf/tutorial/blob/master/streaming.png)
+![image](https://github.com/myspf/tutorial/blob/master/streaming11.png)
 
 
 队列的深度可以通参数来设置（见6.1节），运行过程，可以通过函数 getStreamingStat() 来查看流表的大小以及各个队列的深度。  
