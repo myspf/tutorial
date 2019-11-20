@@ -32,12 +32,12 @@ share t as st
 ![image](https://github.com/myspf/tutorial/blob/master/share5.png)
 
 ### 1.3 内存查看方式
-函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。
+函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。  
 | userId | sessionId | memSize |
 | :------| ------: | :------: |
  userId表示该Session中登录的用户，sessionId表示session，memSize表示占用内存大小，单位为字节。
 
-函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。
+函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。  
 | blockSize | freeSize | freeBlock | leafSize |
 | :------| ------: | :------: | :------: |
 blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSize - freeSize 表示实际使用的内存。
@@ -81,7 +81,7 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 login(`admin,`123456)
 getSessionMemoryStat()
 ```
-输出如下：
+输出如下：  
 | userId | sessionId | memSize |
 | :------| ------: | :------: |
 | admin | 4,203,157,148 | 612,369,840 |
