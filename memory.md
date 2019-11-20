@@ -4,11 +4,13 @@ DolphinDB是一款提供多用户并发读写的分布式数据库软件，其�
 
 * __Session变量内存管理__ ，为用户提供和回收编程环境所需内存，隔离Session间的内存空间； 
 * __分布式表的内存管理__ ，Session间共享分区表数据，以提高内存使用率；
-* __为流数据提供缓存__ ，流数据发送节点提供持久化和发送队列缓存,订阅节点提供接受队列缓存； 
-* __为写入DFS数据库提供缓存__ ，通过批量写入DFS大幅提升写入吞吐量；
+* __为流数据提供缓存__ ，流数据发送节点提供持久化和发送队列缓存,订阅节点提供接收数据队列缓存； 
+* __为写入DFS数据库提供缓存__ ，写入DFS的数据先写到缓存里里面， 通过批量写入大幅提升吞吐量；
 
 ## 1. 概述
-### 1.1 Session和user
+DolphinDB的内存管理涉及到几个概念，首先是Session和user，Session提供内存变量的载体，用户通过登录可以访问Session里的变量。  
+根据变量的可见性，分为Session变量和share变量，Session变量只在定义的Session中可见，在其他Session中不可见。而Share变量对所有的Session可见。
+### 1.1 Session和用户
 DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
 
 ![image](https://github.com/myspf/tutorial/blob/master/user5.png) 
@@ -29,15 +31,15 @@ share t as st
 ![image](https://github.com/myspf/tutorial/blob/master/share5.png)
 
 ### 1.3 内存查看方式
-函数getSessionMemoryStat() 查看每个session占用的内存空间。
+函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。
+  userId|sessionId|memSize
+ userId表示该Session中登录的用户，sessionId表示session，memSize表示占用内存大小，单位为字节。
 
-
-函数mem()来查看DolphinDB server 总的内存占用。
-
+函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。
+  blockSize|freeSize|freeBlock|leafSize
+blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSize - freeSize 表示实际使用的内存。
 
 后续通过这两个函数查看示例的内存。
-
-
 
 ## 2. session变量内存管理
 
