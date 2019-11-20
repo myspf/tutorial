@@ -27,6 +27,7 @@ share t as st
 则st为S hare变量，在所有的Session中共享，不属于某一个Session。如下图所示：
 
 ![image](https://github.com/myspf/tutorial/blob/master/share.png)
+<img src="https://github.com/myspf/tutorial/blob/master/share.png" title="Logo" width="20" />
 
 ### 1.3 内存查看方式
 函数getSessionMemoryStat() 查看每个session占用的内存空间。
