@@ -11,7 +11,7 @@ DolphinDB是一款提供多用户并发读写的分布式数据库软件，其�
 ### 1.1 Session和user
 DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
 
-![image](https://github.com/myspf/tutorial/blob/master/user4.png) 
+![image](https://github.com/myspf/tutorial/blob/master/user5.png) 
 
 usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Session中，则usr2可以看到并且使用Session1中的变量。
 因此，Session类似容器，里面真正持有变量空间。用户类似观察者，可以登录不同的session查看和使用该Session中年的内存和变量。
@@ -26,7 +26,7 @@ share t as st
 ```
 则st为S hare变量，在所有的Session中共享，不属于某一个Session。如下图所示：
 
-![image](https://github.com/myspf/tutorial/blob/master/share3.png)
+![image](https://github.com/myspf/tutorial/blob/master/share5.png)
 
 ### 1.3 内存查看方式
 函数getSessionMemoryStat() 查看每个session占用的内存空间。
@@ -178,7 +178,7 @@ sum(mem().blockSize - mem().freeSize)
 ## 4 作为流数据消息缓存队列
 当数据进入流数据系统时，首先写入流表，然后写入持久化队列和发送队列（假设用户设置为异步持久化），持久化队列异步写入磁盘，发送队列发送到订阅端。  
 当订阅端收到数据后，先放入接受队列，然后用户定义的handler从接收队列中取数据并处理。如果handler处理缓慢，会导致接收队列有数据堆积，占用内存。如下图所示：
-![image](https://github.com/myspf/tutorial/blob/master/streaming.png)
+![image](https://github.com/myspf/tutorial/blob/master/streaming5.png)
 
 
 队列的深度可以通参数来设置（见6.1节），运行过程，可以通过函数 getStreamingStat() 来查看流表的大小以及各个队列的深度。  
@@ -187,7 +187,7 @@ sum(mem().blockSize - mem().freeSize)
 
 DolphinDB为了提高写入的吞吐量，采用先缓存写入的数据，等到一定数量时，批量写入。这样减少和磁盘文件的交互次数，提升写入性能，可提升30%+的写入速度。因此，也需要一定的内存空间来临时缓存这些数据，如下图所示：
 
-![image](https://github.com/myspf/tutorial/blob/master/cacheengine.png)
+![image](https://github.com/myspf/tutorial/blob/master/cacheengine5.png)
 
 当事务t1，t2，t3都完成时，将三个事务的数据一次性写入到DFS的数据库磁盘上。Cache Engine空间一般推荐为maxMemSize的1/8~1/4,可根据最大内存和写入数据量适当调整。
 
