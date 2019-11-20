@@ -11,7 +11,7 @@ DolphinDB是一款提供多用户并发读写的分布式数据库软件，其�
 ### 1.1 Session和user
 DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
 
-![image](https://github.com/myspf/tutorial/blob/master/user2.png) 
+![image](https://github.com/myspf/tutorial/blob/master/user3.png) 
 
 usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Session中，则usr2可以看到并且使用Session1中的变量。
 因此，Session类似容器，里面真正持有变量空间。用户类似观察者，可以登录不同的session查看和使用该Session中年的内存和变量。
@@ -26,7 +26,7 @@ share t as st
 ```
 则st为S hare变量，在所有的Session中共享，不属于某一个Session。如下图所示：
 
-![image](https://github.com/myspf/tutorial/blob/master/share2.png)
+![image](https://github.com/myspf/tutorial/blob/master/share3.png)
 
 ### 1.3 内存查看方式
 函数getSessionMemoryStat() 查看每个session占用的内存空间。
