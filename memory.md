@@ -1,6 +1,5 @@
 # DolphinDB 内存管理
-| 左对齐标题 | 右对齐标题 | 居中对齐标题 |
-| :------| ------: | :------: |
+
 
 DolphinDB是一款提供多用户并发读写的分布式数据库软件，其中高效的内存管理是其性能优异的基础，DolphinDB内存管理包括以下功能：
 
@@ -34,11 +33,13 @@ share t as st
 
 ### 1.3 内存查看方式
 函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。
-  |userId|sessionId|memSize|  
+| userId | sessionId | memSize |
+| :------| ------: | :------: |
  userId表示该Session中登录的用户，sessionId表示session，memSize表示占用内存大小，单位为字节。
 
 函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。
-  |blockSize|freeSize|freeBlock|leafSize|  
+| blockSize | freeSize | freeBlock | leafSize |
+| :------| ------: | :------: | :------: |
 blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSize - freeSize 表示实际使用的内存。
 
 后续通过这两个函数查看示例的内存。
@@ -82,7 +83,7 @@ getSessionMemoryStat()
 ```
 输出如下：
 | userId | sessionId | memSize |
-|---|:--:|---:|
+| :------| ------: | :------: |
 | admin | 4,203,157,148 | 612,369,840 |
 | user1 | 1,769,725,800 | 612,369,840 |
 
