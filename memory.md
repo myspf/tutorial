@@ -29,7 +29,7 @@ share t as st
 
 ![image](https://github.com/myspf/tutorial/blob/master/share5.png)
 
-### 1.3 内存查看方式
+### 1.3 查看内存占用量
 
 函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。  
 
