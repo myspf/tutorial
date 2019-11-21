@@ -17,7 +17,7 @@ DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，web�
 usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Session中，则usr2可以看到并且使用Session1中的变量。
 因此，Session类似容器，里面真正持有变量空间。用户类似观察者，可以登录不同的session查看和使用该Session中年的内存和变量。
 
-### 1.2 Share变量和Session变量
+### 1.2 Session变量和Share变量
 
 Session变量只在定义的Session中可见，定义变量的默认方式为Session变量。比如 ```v = 1..100000```，v为私有变量仅在定义的Session中可见。
 Share变量不属于某一个session，在所有session中可见，目前仅 __table__ 可以设置为Share变量。可通过如下方式创建Share变量：
@@ -45,7 +45,7 @@ blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSiz
 
 后续通过这两个函数查看示例的内存。
 
-## 2. session变量内存管理
+## 2. Session变量内存管理
 
 ### 2.1 创建变量
 
