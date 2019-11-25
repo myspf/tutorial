@@ -1,7 +1,7 @@
 # DolphinDB 内存管理
-DolphinDB是一款提供多用户并发读写的分布式数据库软件，其中高效的内存管理是其性能优异的基础，DolphinDB内存管理包括以下方面：
+DolphinDB是一款提供多用户并发读写的分布式数据库软件，其中高效的内存管理是其性能优异的基础，DolphinDB内存管理包括以下方面：  
 
-* __Session变量内存管理__ ，为用户提供和回收编程环境所需内存，隔离Session间的内存空间； 
+* __变量的内存管理__ ，为用户提供和回收编程环境所需内存； 
 * __分布式表的内存管理__ ，Session间共享分区表数据，以提高内存使用率；
 * __为流数据提供缓存__ ，流数据发送节点提供持久化和发送队列缓存,订阅节点提供接收数据队列缓存； 
 * __为写入DFS数据库提供缓存__ ，写入DFS的数据先写到缓存里里面， 通过批量写入大幅提升吞吐量；
@@ -16,54 +16,10 @@ __内存占用不超过maxMemSize时，尽量多缓存数据__ ，当节点的�
 
 __每隔30秒扫描一次，空闲的内存块（512兆内存中全部空闲）还给操作系统__ ，当用户使用释放内存变量，或者使用函数clearAllCache释放缓存时，如果512兆的内存全部空闲，则会整体还给操作系统，如果仍有小部分内存在使用，比如512兆的内存块中仍有10兆在使用，则不不会归还操作系统。
 
-## 2 基本概念
-DolphinDB的内存管理涉及到几个概念，首先是Session和user，Session是提供内存变量的载体，用户通过登录可以访问Session里的变量。  
-根据变量的可见性，分为Session变量和share变量，Session变量只在定义的Session中可见，在其他Session中不可见。而Share变量对所有的Session可见。
-### 1.1 Session和用户
-DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，Web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
-
-![image](https://github.com/myspf/tutorial/blob/master/user.png) 
-
-
-usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Session中，则usr2可以看到并且使用Session1中的变量。
-因此，Session类似容器，里面真正持有变量空间。用户类似观察者，可以登录不同的session查看和使用该Session中年的内存和变量。
-
-### 1.2 Session变量和Share变量
-
-Session变量只在定义的Session中可见，定义变量的默认方式为Session变量。比如 ```v = 1..100000```，v为私有变量仅在定义的Session中可见。
-Share变量不属于某一个session，在所有session中可见，目前仅 __table__ 可以设置为Share变量。可通过如下方式创建Share变量。  
-示例1 创建share变量
-```
-t = table(1 2 3 as id, 4 5 6 as num)
-share t as st
-```
-则st为Share变量，在所有的Session中共享，不属于某一个Session。如下图所示：
-
-![image](https://github.com/myspf/tutorial/blob/master/session.png)
-
-### 1.3 查看内存占用量
-
-函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。  
-
-|  userId   | sessionId  | memSize |
-|  ----  | ----  | ---- |
-
- userId表示该Session中登录的用户，sessionId表示session，memSize表示占用内存大小，单位为字节。
-
-函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。 
-
-|  blockSize   | freeSize  | freeBlock | leafSize |
-| ---- | ----  | ---- | ---- |
-
-blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSize - freeSize 表示实际使用的内存。
-后续的示例通过这两个函数查看DolphinDB节点上的内存占用。
-
-## 2. Session变量内存管理
-
+## 2. 变量的内存管理
 ### 2.1 创建变量
-
 我们在DolphinDB 节点上，先创建一个用户user1，然后登陆。创建vector变量，1亿个int类型，约400兆。  
-示例2 创建session变量vector
+示例2 创建vector变量
 ```
 login("admin","123456")  //创建用户需要登陆admin
 createUser("user1","123456")
@@ -74,7 +30,7 @@ sum(mem().blockSize - mem().freeSize) //输出内存占用结果
 结果为: 402,865,056，内存占用400兆左右，符合预期。
 
 再创建一个table，1000万行，5列，每列4字节，约200兆。  
-示例3 创建session变量table
+示例3 创建table变量
 ```
 n = 10000000
 t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
@@ -82,36 +38,7 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 ```
 结果为：612,530,448，约600兆，符合预期。
 
-### 2.2 Session间内存隔离
-DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。再新建一个session（打开另一个GUI），创建同名的vector以及table。  
-示例4 不同的session中创建session变量
-```
-login("user1","123456")
-v = 1..100000000
-n = 10000000
-t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
-(mem().blockSize - mem().freeSize).sum()
-```
-结果为 ：1224926000，占用内存约1.2G。
-
-用函数getSessionMemoryStat()查看sesion的内存。  
-示例5 查看内存占用
-```
-login(`admin,`123456)
-getSessionMemoryStat()
-```
-输出如下：  
-
-|  userId   | sessionId  | memSize |
-|  ----  | ----  | ---- |
-| admin  | 4,203,157,148 | 612,369,840 |
-| user1  | 1,769,725,800 | 612,369,840 |
-
-
-由上可知，sevver内存共占用1.2G，在两个Session中。当前第一个Session中登陆了usr1用户，第二个Session中登陆了admin用户。内存空间完全隔离。
-  
-### 2.3 释放内存
-
+### 2.2 释放变量
 可通过undef函数，释放变量的内存。  
 示例6 undef或者赋值为NULL释放session变量
 ```
