@@ -84,12 +84,6 @@ login(`admin,`123456)
 getSessionMemoryStat()
 ```
 输出如下：  
-| userId | sessionId | memSize |  
-| :------| ------: | :------: |  
-| admin | 4,203,157,148 | 612,369,840 |  
-| user1 | 1,769,725,800 | 612,369,840 |  
-
-
 
 |  userId   | sessionId  | memSize |
 |  ----  | ----  | ---- |
