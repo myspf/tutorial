@@ -160,7 +160,7 @@ sum(mem().blockSize - mem().freeSize)
 
 ### 3.3 内存不超过maxMemSize情况下，尽量多缓存数据
 通常情况下，最近访问的数据往往更容易再次被访问，因此DolphinDB在内存允许的情况下（内存占用不超过用户设置的maxMemSize），尽量多缓存数据，来提升后续数据的访问效率。
-![image](https://github.com/myspf/tutorial/blob/master/Selection_381.png)
+![image](https://github.com/myspf/tutorial/blob/master/Selection_382.png)
 示例5：在node1 上先加载2019.01.01的分区数据，查看内存
 ```
 select * from loadTable(dbName,tableName) where date = 2019.01.01
