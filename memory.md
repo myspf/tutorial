@@ -21,7 +21,8 @@ usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Se
 ### 1.2 Session变量和Share变量
 
 Session变量只在定义的Session中可见，定义变量的默认方式为Session变量。比如 ```v = 1..100000```，v为私有变量仅在定义的Session中可见。
-Share变量不属于某一个session，在所有session中可见，目前仅 __table__ 可以设置为Share变量。可通过如下方式创建Share变量：
+Share变量不属于某一个session，在所有session中可见，目前仅 __table__ 可以设置为Share变量。可通过如下方式创建Share变量。
+示例1 创建share变量
 ```
 t = table(1 2 3 as id, 4 5 6 as num)
 share t as st
@@ -52,6 +53,7 @@ blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSiz
 ### 2.1 创建变量
 
 我们在DolphinDB 节点上，先创建一个用户user1，然后登陆。创建vector变量，1亿个int类型，约400兆。
+示例2 创建session变量vector
 ```
 login("admin","123456")  //创建用户需要登陆admin
 createUser("user1","123456")
@@ -62,6 +64,7 @@ sum(mem().blockSize - mem().freeSize) //输出内存占用结果
 结果为: 402,865,056，内存占用400兆左右，符合预期。
 
 再创建一个table，1000万行，5列，每列4字节，约200兆。
+示例3 创建session变量table
 ```
 n = 10000000
 t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
@@ -70,7 +73,8 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 结果为：612,530,448，约600兆，符合预期。
 
 ### 2.2 Session间内存隔离
-DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。再新建一个session（打开另一个GUI），创建同名的vector以及table。如下：
+DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。再新建一个session（打开另一个GUI），创建同名的vector以及table。
+示例4 不同的session中创建session变量
 ```
 login("user1","123456")
 v = 1..100000000
@@ -81,6 +85,7 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 结果为 ：1224926000，占用内存约1.2G。
 
 用函数getSessionMemoryStat()查看sesion的内存，如下：
+示例5 查看内存占用
 ```
 login(`admin,`123456)
 getSessionMemoryStat()
@@ -97,7 +102,8 @@ getSessionMemoryStat()
   
 ### 2.3 释放内存
 
-可通过undef函数，释放变量的内存，如下
+可通过undef函数，释放变量的内存。
+示例6 undef或者赋值为NULL释放session变量
 ```
 undef(`v)
 ```
@@ -121,15 +127,15 @@ DolphinDB中对分布式表是以分区为单位管理的，数据在不同的se
 >函数clearAllCache() 可以清空已经缓存的数据，下面的每次测试前，先用该函数清空节点上的所有缓存。
 
 ### 3.1 内存以分区列为单位进行管理
-DolphinDB是列式存储，当用户对分布式表的数据进行查询时，加载数据的原则是，只把用户所要求的分区和列加载到内存中。
-示例1 计算分区2019.01.01最大的tag1的值。该分区储存在node1上，可以在controller上通过函数getClusterChunksStatus()查看分区分布情况，而且由上面可知，每列约80兆。在node1上执行如下代码，并查看内存占用。
+DolphinDB是列式存储，当用户对分布式表的数据进行查询时，加载数据的原则是，只把用户所要求的分区和列加载到内存中。  
+示例7 计算分区2019.01.01最大的tag1的值。该分区储存在node1上，可以在controller上通过函数getClusterChunksStatus()查看分区分布情况，而且由上面可知，每列约80兆。在node1上执行如下代码，并查看内存占用。
 ```
 select max(tag1) from loadTable(dbName,tableName) where day = 2019.01.01
 sum(mem().blockSize - mem().freeSize) 
 ```
 输出结果为：84,267,136。我们只查询1个分区的一列数据，所以把该列数据全部加载到内存，其他的列不加载。
 
-示例2 在node1 上查询 2019.01.01的前100条数据，并观察内存占用
+示例8 在node1 上查询 2019.01.01的前100条数据，并观察内存占用
 ```
 select top 100 * from loadTable(dbName,tableName) where day = 2019.01.01
 sum(mem().blockSize - mem().freeSize)
@@ -143,14 +149,14 @@ sum(mem().blockSize - mem().freeSize)
 ### 3.2 数据只加载到所在的节点，不会在节点间转移
 在数据量大的情况下，节点间转移数据是非常耗时的操作。DolphinDB的数据是分布式存储的，当执行计算任务时，把计算任务发送到数据所在的节点，而不是把数据转移到计算所在的节点，这样大大降低数据在节点间的转移，提升计算效率。
 
-示例3 在node1上计算两个分区tag1的最大值。其中分区2019.01.02数组存储在node1上，分区2019.01.03数据存储在node2上。如下：
+示例9 在node1上计算两个分区tag1的最大值。其中分区2019.01.02数组存储在node1上，分区2019.01.03数据存储在node2上。如下：
 ```
 select max(tag1) from loadTable(dbName,tableName) where day in [2019.01.02,2019.01.03]
 sum(mem().blockSize - mem().freeSize) 
 ```
 输出结果为：84,284,096。在node2上用查看内存占用 结果为 84,250,624。每个节点存储的数据都为80M左右，也就是node1上存储了分区 2019.01.02的数据，node2上存储了 2019.01.03的数据。
 
-示例4 在node1上查询分区2019.01.02和2019.01.03的所有数据，我们预期node1加载2019.01.02数据，node2加载2019.01.03的数据，都是800M左右，执行如下代码并观察内存：
+示例10 在node1上查询分区2019.01.02和2019.01.03的所有数据，我们预期node1加载2019.01.02数据，node2加载2019.01.03的数据，都是800M左右，执行如下代码并观察内存：
 ```
 select top 100 * from loadTable(dbName,tableName) where day in [2019.01.02,2019.01.03]
 sum(mem().blockSize - mem().freeSize)
@@ -161,7 +167,7 @@ node1上输出结果为，839,279,968。node2上输出结果为，839,246,496。
 
 ### 3.3 内存中只保留数据的一份副本
 DolphinDB支持海量数据的并发查询，为了高效利用内存，对相同分区的数据，内存中只保留一份数据。
-示例5 打开两个GUI，分别连接node1和node2，查询分区2019.01.01的数据，该分区的数据存储在node1上，执行如下代码
+示例11 打开两个GUI，分别连接node1和node2，查询分区2019.01.01的数据，该分区的数据存储在node1上，执行如下代码
 ```
 select * from loadTable(dbName,tableName) where date = 2019.01.01
 sum(mem().blockSize - mem().freeSize)
@@ -171,7 +177,7 @@ sum(mem().blockSize - mem().freeSize)
 ### 3.4 内存使用不超过maxMemSize情况下，尽量多缓存数据
 通常情况下，最近访问的数据往往更容易再次被访问，因此DolphinDB在内存允许的情况下（内存占用不超过用户设置的maxMemSize），尽量多缓存数据，来提升后续数据的访问效率。
  
-示例6：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，每个分区约800M，总内存占用约7.2GB，观察内存的变化趋势
+示例12：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，每个分区约800M，总内存占用约7.2GB，观察内存的变化趋势
 ```
 days = chunksOfEightDays();
 for(d in days){
@@ -190,7 +196,7 @@ for(d in days){
 ![image](https://github.com/myspf/tutorial/blob/master/partition15.png)   
 如上图所示，当缓存的数据超过maxMemSize时，系统自动回收内存，总的内存使用量仍然小于用户设置的最大内存量8GB。
 
-示例8: 当缓存数据接近用户设置的maxMemSize时，继续申请Session变量的内存空间，查看系统内存占用。
+示例13: 当缓存数据接近用户设置的maxMemSize时，继续申请Session变量的内存空间，查看系统内存占用。
 此时先查看下系统的内存使用
 ```
 sum(mem().blockSize - mem().freeSize)
