@@ -135,7 +135,7 @@ sum(mem().blockSize - mem().freeSize)
 ```
 输出结果为：84,267,136。我们只查询1个分区的一列数据，所以把该列数据全部加载到内存，其他的列不加载。
 
-示例8 在node1 上查询 2019.01.01的前100条数据，并观察内存占用
+示例8 在node1 上查询 2019.01.01的前100条数据，并观察内存占用。
 ```
 select top 100 * from loadTable(dbName,tableName) where day = 2019.01.01
 sum(mem().blockSize - mem().freeSize)
@@ -149,14 +149,14 @@ sum(mem().blockSize - mem().freeSize)
 ### 3.2 数据只加载到所在的节点，不会在节点间转移
 在数据量大的情况下，节点间转移数据是非常耗时的操作。DolphinDB的数据是分布式存储的，当执行计算任务时，把计算任务发送到数据所在的节点，而不是把数据转移到计算所在的节点，这样大大降低数据在节点间的转移，提升计算效率。
 
-示例9 在node1上计算两个分区tag1的最大值。其中分区2019.01.02数组存储在node1上，分区2019.01.03数据存储在node2上。如下：
+示例9 在node1上计算两个分区tag1的最大值。其中分区2019.01.02数组存储在node1上，分区2019.01.03数据存储在node2上。
 ```
 select max(tag1) from loadTable(dbName,tableName) where day in [2019.01.02,2019.01.03]
 sum(mem().blockSize - mem().freeSize) 
 ```
 输出结果为：84,284,096。在node2上用查看内存占用 结果为 84,250,624。每个节点存储的数据都为80M左右，也就是node1上存储了分区 2019.01.02的数据，node2上存储了 2019.01.03的数据。
 
-示例10 在node1上查询分区2019.01.02和2019.01.03的所有数据，我们预期node1加载2019.01.02数据，node2加载2019.01.03的数据，都是800M左右，执行如下代码并观察内存：
+示例10 在node1上查询分区2019.01.02和2019.01.03的所有数据，我们预期node1加载2019.01.02数据，node2加载2019.01.03的数据，都是800M左右，执行如下代码并观察内存。
 ```
 select top 100 * from loadTable(dbName,tableName) where day in [2019.01.02,2019.01.03]
 sum(mem().blockSize - mem().freeSize)
@@ -167,7 +167,7 @@ node1上输出结果为，839,279,968。node2上输出结果为，839,246,496。
 
 ### 3.3 内存中只保留数据的一份副本
 DolphinDB支持海量数据的并发查询，为了高效利用内存，对相同分区的数据，内存中只保留一份数据。
-示例11 打开两个GUI，分别连接node1和node2，查询分区2019.01.01的数据，该分区的数据存储在node1上，执行如下代码
+示例11 打开两个GUI，分别连接node1和node2，查询分区2019.01.01的数据，该分区的数据存储在node1上。
 ```
 select * from loadTable(dbName,tableName) where date = 2019.01.01
 sum(mem().blockSize - mem().freeSize)
@@ -177,7 +177,7 @@ sum(mem().blockSize - mem().freeSize)
 ### 3.4 内存使用不超过maxMemSize情况下，尽量多缓存数据
 通常情况下，最近访问的数据往往更容易再次被访问，因此DolphinDB在内存允许的情况下（内存占用不超过用户设置的maxMemSize），尽量多缓存数据，来提升后续数据的访问效率。
  
-示例12：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，每个分区约800M，总内存占用约7.2GB，观察内存的变化趋势
+示例12：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，每个分区约800M，总内存占用约7.2GB，观察内存的变化趋势。
 ```
 days = chunksOfEightDays();
 for(d in days){
@@ -252,3 +252,12 @@ DolphinDB提供了一些内存相关的配置选项，如下：
 *  __用完的变量或者session，尽快释放__,根据上面的分析可以知道，用户的私有变量在创建的session里面保存，并且session关闭的时候，会回收这些内存。因此，及早释放这些私有变量（undef）或者关闭session来释放内存。
 
 *  __合理配置流数据的缓存区__,一般情况下流数据的容量capacity会直接影响发布节点的内存占用。比如，capacity设置1000万条，那么流数据表在超过1000万条时，会回收约一半的内存占用，也就是内存中会保留500万条左右。因此，根据发布节点的最大内存，合理的流表的capacity，尤其是在多张发布表的情况，更需要谨慎设计。
+
+## 8 内存相关函数
+
+clearAllCache()，清楚分区表的缓存。
+mem([freeUnusedBlocks=false]) ，查看内存使用情况，如果freeUnusedBlocks=true，系统将会释放未使用的内存块。
+undef(obj, [objType=VAR])，从内存中释放变量和函数定义。objType: 需要取消定义的对象的类型，VAR（本地变量）,SHARED（共享变量）。
+getSessionMemoryStat()，返回当前节点的所有会话的内存使用信息。由于共享表和分布式表不属于某个用户或会话，因此返回结果中不包含它们占用的内存信息。
+
+
