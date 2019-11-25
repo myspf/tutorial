@@ -193,7 +193,7 @@ for(d in days){
 ### 3.5  缓存数据达到maxMemSize时，系统自动回收
 如果DolphinDB server使用的内存，没有超过用户设置的maxMemSize，则不会回收内存。当总的内存使用达到maxMemSize时，DolphinDB 会采用LRU的内存回收策略， 来腾出足够的内存给用户。
 示例7，上面用例中我们只加载了8天的数据，此时我们继续共遍历15天数据，查看缓存达到maxMemSize时，内存的占用情况。如下图所示：
-![image](https://github.com/myspf/tutorial/blob/master/partition15.png)   
+![image](https://github.com/myspf/tutorial/blob/master/partiton15.png)   
 如上图所示，当缓存的数据超过maxMemSize时，系统自动回收内存，总的内存使用量仍然小于用户设置的最大内存量8GB。
 
 示例13: 当缓存数据接近用户设置的maxMemSize时，继续申请Session变量的内存空间，查看系统内存占用。
