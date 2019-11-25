@@ -158,22 +158,22 @@ sum(mem().blockSize - mem().freeSize)
 ```
 上面的代码不管执行几次，node1上内存显示一直是 839,101,024，而node2上无内存占用。因为分区数据只存储在node1上，所以node1会加载所有数据，而node2不占用任何内存。
 
-### 3.3 内存不超过maxMemSize情况下，尽量多缓存数据
+### 3.4 内存不超过maxMemSize情况下，尽量多缓存数据
 通常情况下，最近访问的数据往往更容易再次被访问，因此DolphinDB在内存允许的情况下（内存占用不超过用户设置的maxMemSize），尽量多缓存数据，来提升后续数据的访问效率。
-![image](https://github.com/myspf/tutorial/blob/master/Selection_383.png)  
-示例5：在node1 上先加载2019.01.01的分区数据，查看内存
+ 
+示例5：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，观察内存的变化趋势
 ```
-select * from loadTable(dbName,tableName) where date = 2019.01.01
-sum(mem().blockSize - mem().freeSize)
+for(d in days){
+ select * from loadTable(dbName,tableName) where date = 2019.01.01
+ sum(mem().blockSize - mem().freeSize)
+}
 ```
-输出结果为：839118272。再查询 2019.01.03的数据，该分区也存储在node1上，
-```
-select * from loadTable(dbName,tableName) where date = 2019.01.03
-sum(mem().blockSize - mem().freeSize)
-```
-输出结果为：1,678,002,080。共1.6G，包含两个分区的数据，之前分区的数据仍然在内存中保留。
+内存随着加载分区数的增加变化规律如下图所示：
+![image](https://github.com/myspf/tutorial/blob/master/Selection_384.png) 
 
-### 3.4  缓存达到用户设置上限时，会自动回收
+
+
+### 3.5  缓存达到用户设置上限时，会自动回收
 如果DolphinDB server使用的内存，没有超过用户设置的maxMemSize，则不会回收内存。当总的内存使用达到maxMemSize时，DolphinDB 会采用LRU的内存回收策略， 来腾出足够的内存给用户。
 示例：不断的查询导致，缓存接近maxMemSize，然后用户申请大量内存，如果不清理缓存则不足以提供足够的内存给用户。
 ```
