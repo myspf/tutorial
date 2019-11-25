@@ -14,6 +14,7 @@ DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，Web�
 
 ![image](https://github.com/myspf/tutorial/blob/master/user.png) 
 
+
 usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Session中，则usr2可以看到并且使用Session1中的变量。
 因此，Session类似容器，里面真正持有变量空间。用户类似观察者，可以登录不同的session查看和使用该Session中年的内存和变量。
 
