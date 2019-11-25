@@ -69,7 +69,8 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 ```
 结果为：612,530,448，约600兆，符合预期。
 
-DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。例如再新建一个session（打开另一个GUI），创建同名的vector以及table。如下：
+### 2.2 Session间内存隔离
+DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。再新建一个session（打开另一个GUI），创建同名的vector以及table。如下：
 ```
 login("user1","123456")
 v = 1..100000000
@@ -94,7 +95,7 @@ getSessionMemoryStat()
 
 由上可知，sevver内存共占用1.2G，在两个Session中。当前第一个Session中登陆了usr1用户，第二个Session中登陆了admin用户。内存空间完全隔离。
   
-### 2.2 释放内存
+### 2.3 释放内存
 
 可通过undef函数，释放变量的内存，如下
 ```
