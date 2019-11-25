@@ -21,7 +21,7 @@ usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Se
 ### 1.2 Session变量和Share变量
 
 Session变量只在定义的Session中可见，定义变量的默认方式为Session变量。比如 ```v = 1..100000```，v为私有变量仅在定义的Session中可见。
-Share变量不属于某一个session，在所有session中可见，目前仅 __table__ 可以设置为Share变量。可通过如下方式创建Share变量。
+Share变量不属于某一个session，在所有session中可见，目前仅 __table__ 可以设置为Share变量。可通过如下方式创建Share变量。  
 示例1 创建share变量
 ```
 t = table(1 2 3 as id, 4 5 6 as num)
@@ -52,7 +52,7 @@ blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSiz
 
 ### 2.1 创建变量
 
-我们在DolphinDB 节点上，先创建一个用户user1，然后登陆。创建vector变量，1亿个int类型，约400兆。
+我们在DolphinDB 节点上，先创建一个用户user1，然后登陆。创建vector变量，1亿个int类型，约400兆。  
 示例2 创建session变量vector
 ```
 login("admin","123456")  //创建用户需要登陆admin
@@ -63,7 +63,7 @@ sum(mem().blockSize - mem().freeSize) //输出内存占用结果
 ```
 结果为: 402,865,056，内存占用400兆左右，符合预期。
 
-再创建一个table，1000万行，5列，每列4字节，约200兆。
+再创建一个table，1000万行，5列，每列4字节，约200兆。  
 示例3 创建session变量table
 ```
 n = 10000000
@@ -73,7 +73,7 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 结果为：612,530,448，约600兆，符合预期。
 
 ### 2.2 Session间内存隔离
-DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。再新建一个session（打开另一个GUI），创建同名的vector以及table。
+DolphinDB提供不同session间的内存隔离，不同的session中创建同名变量，内存空间占用也是完全独立的。再新建一个session（打开另一个GUI），创建同名的vector以及table。  
 示例4 不同的session中创建session变量
 ```
 login("user1","123456")
@@ -84,7 +84,7 @@ t = table(n:n,["tag1","tag2","tag3","tag4","tag5"],[INT,INT,INT,INT,INT])
 ```
 结果为 ：1224926000，占用内存约1.2G。
 
-用函数getSessionMemoryStat()查看sesion的内存，如下：
+用函数getSessionMemoryStat()查看sesion的内存。  
 示例5 查看内存占用
 ```
 login(`admin,`123456)
@@ -102,7 +102,7 @@ getSessionMemoryStat()
   
 ### 2.3 释放内存
 
-可通过undef函数，释放变量的内存。
+可通过undef函数，释放变量的内存。  
 示例6 undef或者赋值为NULL释放session变量
 ```
 undef(`v)
