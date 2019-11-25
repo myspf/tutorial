@@ -12,7 +12,7 @@ DolphinDB的内存管理涉及到几个概念，首先是Session和user，Sessio
 ### 1.1 Session和用户
 DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，Web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
 
-![image](https://github.com/myspf/tutorial/blob/master/user5.png) 
+![image](https://github.com/myspf/tutorial/blob/master/user.png) 
 
 usr1可以登录Session1，创建变量v和t。如果此时，usr2登录到该Session中，则usr2可以看到并且使用Session1中的变量。
 因此，Session类似容器，里面真正持有变量空间。用户类似观察者，可以登录不同的session查看和使用该Session中年的内存和变量。
@@ -27,19 +27,19 @@ share t as st
 ```
 则st为S hare变量，在所有的Session中共享，不属于某一个Session。如下图所示：
 
-![image](https://github.com/myspf/tutorial/blob/master/share5.png)
+![image](https://github.com/myspf/tutorial/blob/master/session.png)
 
 ### 1.3 查看内存占用量
 
 函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。  
 
-![image](https://github.com/myspf/tutorial/blob/master/getsession1.png)
+![image](https://github.com/myspf/tutorial/blob/master/getsession.png)
 
  userId表示该Session中登录的用户，sessionId表示session，memSize表示占用内存大小，单位为字节。
 
 函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。
 
-![image](https://github.com/myspf/tutorial/blob/master/mem1.png)
+![image](https://github.com/myspf/tutorial/blob/master/mem.png)
 
 blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSize - freeSize 表示实际使用的内存。
 
@@ -169,14 +169,14 @@ for(d in days){
 }
 ```
 内存随着加载分区数的增加变化规律如下图所示：
-![image](https://github.com/myspf/tutorial/blob/master/Selection_384.png) 
+![image](https://github.com/myspf/tutorial/blob/master/partition9.png) 
 
 当遍历每个分区数据时，在内存使用量不超过maxMemSize的情况下，分区数据会全部缓存到内存中，以在用户下次访问时，直接从内存中提供数据，而不需要再次从磁盘加载。
 
 ### 3.5  分区缓存数据达到maxMemSize时，系统自动回收
 如果DolphinDB server使用的内存，没有超过用户设置的maxMemSize，则不会回收内存。当总的内存使用达到maxMemSize时，DolphinDB 会采用LRU的内存回收策略， 来腾出足够的内存给用户。
 示例7，上面用例中我们只加载了8天的数据，此时我们继续共遍历15天数据，查看缓存达到maxMemSize时，内存的占用情况。如下图所示：
-![image](https://github.com/myspf/tutorial/blob/master/Selection_383.png)   
+![image](https://github.com/myspf/tutorial/blob/master/partition15.png)   
 如上图所示，当缓存的数据超过maxMem时，系统自动回收内存，总的内存使用量仍然小于用户设置的最大内存量8GB。
 
 示例8: 当缓存数据接近用户设置的maxMemSize时，继续申请Session变量的内存空间，查看系统内存占用。
@@ -197,7 +197,7 @@ sum(mem().blockSize - mem().freeSize)
 ## 4 作为流数据消息缓存队列
 当数据进入流数据系统时，首先写入流表，然后写入持久化队列和发送队列（假设用户设置为异步持久化），持久化队列异步写入磁盘，发送队列发送到订阅端。  
 当订阅端收到数据后，先放入接受队列，然后用户定义的handler从接收队列中取数据并处理。如果handler处理缓慢，会导致接收队列有数据堆积，占用内存。如下图所示：
-![image](https://github.com/myspf/tutorial/blob/master/streaming5.png)
+![image](https://github.com/myspf/tutorial/blob/master/streaming.png)
 
 
 队列的深度可以通参数来设置（见6.1节），运行过程，可以通过函数 getStreamingStat() 来查看流表的大小以及各个队列的深度。  
@@ -206,7 +206,7 @@ sum(mem().blockSize - mem().freeSize)
 
 DolphinDB为了提高写入的吞吐量，采用先缓存写入的数据，等到一定数量时，批量写入。这样减少和磁盘文件的交互次数，提升写入性能，可提升30%+的写入速度。因此，也需要一定的内存空间来临时缓存这些数据，如下图所示：
 
-![image](https://github.com/myspf/tutorial/blob/master/cacheengine5.png)
+![image](https://github.com/myspf/tutorial/blob/master/cacheEngine.png)
 
 当事务t1，t2，t3都完成时，将三个事务的数据一次性写入到DFS的数据库磁盘上。Cache Engine空间一般推荐为maxMemSize的1/8~1/4,可根据最大内存和写入数据量适当调整。
 
