@@ -255,9 +255,9 @@ DolphinDB提供了一些内存相关的配置选项，如下：
 
 ## 8 内存相关函数
 
-clearAllCache()，清楚分区表的缓存。
-mem([freeUnusedBlocks=false]) ，查看内存使用情况，如果freeUnusedBlocks=true，系统将会释放未使用的内存块。
-undef(obj, [objType=VAR])，从内存中释放变量和函数定义。objType: 需要取消定义的对象的类型，VAR（本地变量）,SHARED（共享变量）。
-getSessionMemoryStat()，返回当前节点的所有会话的内存使用信息。由于共享表和分布式表不属于某个用户或会话，因此返回结果中不包含它们占用的内存信息。
+clearAllCache()，清楚分区表的缓存。  
+mem([freeUnusedBlocks=false]) ，查看内存使用情况，如果freeUnusedBlocks=true，系统将会释放未使用的内存块。  
+undef(obj, [objType=VAR])，从内存中释放变量和函数定义。objType: 需要取消定义的对象的类型，VAR（本地变量）,SHARED（共享变量）。  
+getSessionMemoryStat()，返回当前节点的所有会话的内存使用信息。由于共享表和分布式表不属于某个用户或会话，因此返回结果中不包含它们占用的内存信息。  
 
 
