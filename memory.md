@@ -32,16 +32,16 @@ share t as st
 
 ### 1.3 查看内存占用量
 
-函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。  
-
-![image](https://github.com/myspf/tutorial/blob/master/getsession.png)
+函数getSessionMemoryStat() 查看每个session占用的内存空间。输出结果为table，包括3列。 
+|  userId   | sessionId  | memSize |
+|  ----  | ----  | ---- |
 
  userId表示该Session中登录的用户，sessionId表示session，memSize表示占用内存大小，单位为字节。
 
 函数mem()来查看DolphinDB server 总的内存占用。输出结果为table，包括4列。
 
-![image](https://github.com/myspf/tutorial/blob/master/mem.png)
-
+|  blockSize   | freeSize  | freeBlock | leafSize |
+|  ----  | ----  | ---- | ---- |
 blockSize表示已经分配的内存，freeSize 表示未使用内存，blockSize - freeSize 表示实际使用的内存。
 
 后续通过这两个函数查看示例的内存。
