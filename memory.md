@@ -1,5 +1,5 @@
 # DolphinDB 内存管理
-DolphinDB是一款提供多用户并发读写的分布式数据库软件，其中高效的内存管理是其性能优异的基础，DolphinDB内存管理包括以下功能：
+DolphinDB是一款提供多用户并发读写的分布式数据库软件，其中高效的内存管理是其性能优异的基础，DolphinDB内存管理包括以下方面：
 
 * __Session变量内存管理__ ，为用户提供和回收编程环境所需内存，隔离Session间的内存空间； 
 * __分布式表的内存管理__ ，Session间共享分区表数据，以提高内存使用率；
@@ -10,7 +10,7 @@ DolphinDB是一款提供多用户并发读写的分布式数据库软件，其�
 DolphinDB的内存管理涉及到几个概念，首先是Session和user，Session提供内存变量的载体，用户通过登录可以访问Session里的变量。  
 根据变量的可见性，分为Session变量和share变量，Session变量只在定义的Session中可见，在其他Session中不可见。而Share变量对所有的Session可见。
 ### 1.1 Session和用户
-DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
+DolphinDB通过session来隔离不同用户间的内存空间，通过GUI，Web或者其他API链接到server，即创建了一个Session。用户登录一个Session可以使用该Session中年的内存变量。私有变量的内存都是存在于某一个Session中。如下图：
 
 ![image](https://github.com/myspf/tutorial/blob/master/user5.png) 
 
