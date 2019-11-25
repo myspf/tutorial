@@ -102,7 +102,6 @@ v = NULL
 ```
 除了undef函数外，当Sessionn关闭时，比如关闭GUI，web notebook 连接断开，或者API 连接端口，都会触发serverd端对该Session的所有内存进行回收。
 
-
 ## 3 分布式表的内存管理
 分布式表的内存是全局共享的，对分布式表某个分区的数据，在内存中只保留一份数据，不管登录到哪个Session中，都可以看到相同的一份数据，这样极大的节省了内存的使用。
 历史数据库都是以分布式表的形式存在数据库中，用户平时查询操作也往往直接与分布式表交互。分布式表的内存管理有如下特点：
@@ -111,7 +110,7 @@ v = NULL
 * 数据只加载到所在的节点，不会在节点间转移
 * 同一分区，内存只保留一份数据；
 * 内存不超过maxMemSize情况下，尽量多缓存数据；
-* 缓存达到用户设置上限时，会自动回收；
+* 分区缓存数据达到maxMemSize时，系统自动回收；
 
 下面我们通过一个具体的实例介绍以上特点。搭建的集群采用2个节点，单副本模式，按天分30个区，每个分区1000万行，10列（1列为timestamp类型，9列为LONG类型），所以每个分区的每列 1000万行 * 8字节/列 = 80M，每个分区共1000 万行 * 80字节/行 = 800M，整个表共3亿行，大小为24GB。
 >函数clearAllCache() 可以情况已经缓存的数据，下面的每次测试前，先用该函数清空节点上的所有缓存。
@@ -161,34 +160,37 @@ sum(mem().blockSize - mem().freeSize)
 ### 3.4 内存不超过maxMemSize情况下，尽量多缓存数据
 通常情况下，最近访问的数据往往更容易再次被访问，因此DolphinDB在内存允许的情况下（内存占用不超过用户设置的maxMemSize），尽量多缓存数据，来提升后续数据的访问效率。
  
-示例5：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，观察内存的变化趋势
+示例6：数据节点设置的maxMemSize = 8GB，我们连续加载9个分区，观察内存的变化趋势
 ```
+days = chunksOfEightDays();
 for(d in days){
- select * from loadTable(dbName,tableName) where date = 2019.01.01
+ select * from loadTable(dbName,tableName) where  = day
  sum(mem().blockSize - mem().freeSize)
 }
 ```
 内存随着加载分区数的增加变化规律如下图所示：
 ![image](https://github.com/myspf/tutorial/blob/master/Selection_384.png) 
 
+当遍历每个分区数据时，在内存使用量不超过maxMemSize的情况下，分区数据会全部缓存到内存中，以在用户下次访问时，直接从内存中提供数据，而不需要再次从磁盘加载。
 
-
-### 3.5  缓存达到用户设置上限时，会自动回收
+### 3.5  分区缓存数据达到maxMemSize时，系统自动回收
 如果DolphinDB server使用的内存，没有超过用户设置的maxMemSize，则不会回收内存。当总的内存使用达到maxMemSize时，DolphinDB 会采用LRU的内存回收策略， 来腾出足够的内存给用户。
-示例：不断的查询导致，缓存接近maxMemSize，然后用户申请大量内存，如果不清理缓存则不足以提供足够的内存给用户。
-```
-select * from loadTable(dbName,tableName) where date = 2019.01.03
-sum(mem().blockSize - mem().freeSize)
-```
-内存占用达到xxxx，然后继续申请内存
-```
-v = 1..1000000000
-sum(mem().blockSize - mem().freeSize)
-```
-说明DolphinB自动回收了足够的内存供用户使用。
+示例7，上面用例中我们只加载了8天的数据，此时我们继续共遍历15天数据，查看缓存达到maxMemSize时，内存的占用情况。如下图所示：
+![image](https://github.com/myspf/tutorial/blob/master/Selection_383.png)   
+如上图所示，当缓存的数据超过maxMem时，系统自动回收内存，总的内存使用量仍然小于用户设置的最大内存量8GB。
 
-### 3.5 内存使用量和分区大小的关系
-由于DolphinDB是以分区为单位管理内存，因此内存的使用量跟分区关系密切。假如用户分区不均匀，导致某个分区数据量超大，甚至整个都不足以容纳整个分区，那么当涉及到该分区的查询计算时，系统会抛出“out of memory”的异常。  
+示例8: 当缓存数据接近用户设置的maxMemSize时，继续申请Session变量的内存空间，查看系统内存占用。
+此时先查看下系统的内存使用
+```
+sum(mem().blockSize - mem().freeSize)
+```
+输出结果为 7,550,138,448。内存占用超过7GB，而用户设置的最大内存使用量为 8GB，此时我们继续申请4GB空间。
+```v = 1..1000000000
+sum(mem().blockSize - mem().freeSize)
+```
+输出结果为 8,196,073,856。约为8GB，也就是如果用户定义变量，也会触发缓存数据的内存回收，以保证有足够的内存提供给用户使用。
+
+> __内存使用量和分区大小的关系__, DolphinDB是以分区为单位管理内存，因此内存的使用量跟分区关系密切。假如用户分区不均匀，导致某个分区数据量超大，甚至整个都不足以容纳整个分区，那么当涉及到该分区的查询计算时，系统会抛出“out of memory”的异常。  
 一般原则，如果用户设置的maxMemSize大小为8GB，则每个分区常用的查询列之和为100-200兆为宜。  
 如果表有10列常用查询字段，每列8字段，则每个分区约100-200万行。  
 
