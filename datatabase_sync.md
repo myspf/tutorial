@@ -5,7 +5,7 @@ DolphinDB提供离线方式和在线方式实现不同集群间数据库的同�
 
 ## 1. 离线方式
 离线方式是先把数据中的各个表，通过DolphinDB提供的backup函数导入到磁盘上，然后将数据同步的到数据库所在的物理机器上，再通过restore函数把将数据从磁盘上恢复到到数据库中。如下所示：
-![image](https://github.com/myspf/tutorial/blob/master/387.png) 
+![image](https://github.com/myspf/tutorial/blob/master/Selection_387.png) 
 
 
 DolphinDB通过向操作系统申请大块内存，并且定期的释放内存来达到内存的平衡，有以下特点:    
