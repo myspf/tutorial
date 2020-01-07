@@ -194,13 +194,13 @@ DolphinDB提供了各种工具来监控集群的性能。包括controller和各�
 
 集群管理器可以监控到30多个性能指标。比较常用的包括各个节点的 cpu利用率、平均负载、内存使用量、连接数、query查询统计、任务队列深度、磁盘写入速度、磁盘读取速度、网络接收速率、网络发送速率等。相关指标如下：
 
-CPU使用率  : CpuUsage、AvgLoad
-内存监控   : MemUsed、MemAlloc、MemLimit
-磁盘监控   : DiskCapacity、DiskFreeSpaceRatio、DiskWriteRate、DiskReadRate、LastMinuteWriteVolume、LastMinuteReadVolume
-网络监控  : networkSendRate、networkRecvRate	lastMinuteNetworkSend	lastMinuteNetworkRecv
-实时查询性能指标  : medLast10QueryTime、maxLast10QueryTime、medLast100QueryTime、maxLast100QueryTime20、maxRunningQueryTime、runningJobs、queuedJobs、runningTasks、queuedTasks、jobLoad
-实时流数据性能指标  : lastMsgLatency、cumMsgLatency
-这些指标也可以通过函数 getClusterPerf() 以table的形式获取到。通过这些监控指标可以反映出整个集群的性能情况。
+CPU使用率  : CpuUsage、AvgLoad  
+内存监控   : MemUsed、MemAlloc、MemLimit  
+磁盘监控   : DiskCapacity、DiskFreeSpaceRatio、DiskWriteRate、DiskReadRate、LastMinuteWriteVolume、LastMinuteReadVolume  
+网络监控  : networkSendRate、networkRecvRate	lastMinuteNetworkSend	lastMinuteNetworkRecv  
+实时查询性能指标  : medLast10QueryTime、maxLast10QueryTime、medLast100QueryTime、maxLast100QueryTime20、maxRunningQueryTime、runningJobs、queuedJobs、runningTasks、queuedTasks、jobLoad  
+实时流数据性能指标  : lastMsgLatency、cumMsgLatency  
+这些指标也可以通过函数 getClusterPerf() 以table的形式获取到。通过这些监控指标可以反映出整个集群的性能情况。  
 比如cpu过高，平均负载过大，说明cpu可能成为集群性能瓶颈；如果磁盘读取基本达到极限，说明IO限制了整体的性能；然后可以再根据上面的指标，对瓶颈点进行配置调优。
 
 #### 5.2 流数据性能监控
