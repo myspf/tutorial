@@ -175,12 +175,12 @@ __persistenceDir__ : 流数据的存储路径，建议设置到`__ssd__`磁盘�
 - 集群设计  
   整体的数据量不大，实际上一个节点就完全可以处理，考虑到以后的扩展性，以及最大化DolphinDB的性能，我们搭建一个发布集群来处理。
   包括4个节点，每个节点内存分12G。其中三个节点上每个节点处理两张表，按照数据量均匀的原则，节点1处理期货和逐笔委托，以此类推。
-- 每个节点的参数配置
+- 每个节点的参数配置  
   persistenceWorkerNum : 集群共有4个节点，物理机器包括16逻辑线程，因此参数设为4。
   maxPubConnections : 根据订阅客户端的多少设置，假设设为16。
   maxPersistenceQueueDepth : 按照每行200字节估算，500万行大概1G，所以该参数可以设置为 10000000，共2G。
   maxPubQueueDepthPerSite : 设置为3000000。最极端的情况，16个订阅端，共0.6G\*16 = 9.6G。系统内存也满足要求。
-  persistenceDir : 每个节点设置为一个单独的磁盘卷。这样持久化的时候，可以并发写入。
+  persistenceDir : 每个节点设置为一个单独的磁盘卷。这样持久化的时候，可以并发写入。  
 
 订阅端可以是各种API客户端，或者DolphinDB server。
 如果是DolphinDB server作为订阅客户端， 性能相关的主要配置下这三个参数 subExecutors、maxSubQueueDepth、maxSubConnections，根据实际情况进行合理配置。subExecutors 根据订阅表的多少配置，其他连个参数可以采用默认值。
