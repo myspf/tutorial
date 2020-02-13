@@ -27,9 +27,7 @@ backup(backupDir,<select * from loadTable("dfs://db1","mt") where TradingDay > d
 backupDir = /hdd/hdd1/backDir		
 backup(backupDir,<select col1,col2,col3 from loadTable("dfs://db1","mt")>)
 ```
-
-
-上面，t为所要复制的分布式表。backup函数把分布式表中符合条件的数据备份到backupDir目录中。复制数据的条件通过sql元代码指定，上面例子中复制数据库t中列day为2019.01.01的一天的数据。
+更灵活的sql元语句表示参考DolphinDB元编程。
 
 * __节点间数据文件同步__ ，如果需要同步的两个数据库不在同一台物理机器上，则需要同步二进制文件。DolphinDB支持shell命令，可利用操作系统提供的文件同步手段来同步目录，比如rsync或者scp命令。其中rsync是linux上的常用命令，只同步发生变化的文件，非常高效。
 ```
@@ -40,10 +38,11 @@ shell(cmd)
 注意:以上命令需要配置ssh免密登录。当然，也可以通过其他服务器同步工具实现。
 
 * __数据恢复__ ，数据同步过来以后，可以从restoreDir中恢复出所需要的数据，通过DolphinDB提供的restore函数
+示例1，恢复所有备份数据库(db1)表(mt)的所有数据到数据库(db2)的表(mt)中：
 ```
-restore(restoreDir,dbName,tableName,"%",true,loadTable(dbName,tableName))
+restore(restoreDir,"dfs://db1","mt","%",true,loadTable("dfs://db2","mt"))
 ```
-如上，把restore下面的所有数据导入到数据库中，完成备份。
+除了恢复所有数据，还可以根据条件恢复指定分区。详细参考教程考[数据备份与恢复](https://github.com/dolphindb/Tutorials_CN/blob/master/restore-backup.md)。
 
 ## 2 在线方式
 在线方式，要求两个集群同时在线，通过建立socket连接，直接从一个集群中读数据，并写入到另一个集群上。如下
