@@ -5,23 +5,39 @@ DolphinDB提供离线方式和在线方式实现不同集群间数据库的同�
 数据库指DFS分布式的数据库，而非内存表或流数据表等
 
 ## 1. 离线方式
-离线方式是先把数据中的各个表，通过DolphinDB提供的backup函数导入到磁盘上，然后将数据同步的到数据库所在的物理机器上，再通过restore函数把将数据从磁盘上恢复到到数据库中。如下所示：
+离线方式是先把数据库中的各个表，通过DolphinDB提供的backup函数以二进制形式导入到磁盘上，然后将数据同步的到数据库所在的物理机器上，再通过restore函数把将数据从磁盘上恢复到到数据库中。如下所示：
 ![image](https://github.com/myspf/tutorial/blob/master/Selection_387.png) 
 
 ### 1.1 同步流程
-* __数据备份__ ，可通过backup函数将需要同步的数据表备份到磁盘上，同时可以制定同步的时间范围，比如当天或者某段时间，
+* __数据备份__ ，可通过backup函数将需要同步的数据表备份到磁盘上，备份是以分区为单位。需要同步的数据可以用sql语句指定，如下：
+示例1，备份数据库(db1)中表(mt)的所有数据：
 ```
-t = loadTable(dbName,tableName)		
-backup(backupDir,sql(sqlCol("*"), t , expr(sqlCol("day"),eq,2019.01.01)))
+backupDir = /hdd/hdd1/backDir		
+backup(backupDir,<select * from loadTable("dfs://db1","mt")>)
 ```
+
+示例2，备份数据库(db1)中表(mt)的最近7天的数据，假设时间分区字段是TradingDay(DATE):
+```
+backupDir = /hdd/hdd1/backDir		
+backup(backupDir,<select * from loadTable("dfs://db1","mt") where TradingDay > date(now()) - 7 and  TradingDay <= date(now())>)
+```
+
+示例3，备份数据库(db1)中表(mt)的某些列(col1,col2,col3)的数据：
+```
+backupDir = /hdd/hdd1/backDir		
+backup(backupDir,<select col1,col2,col3 from loadTable("dfs://db1","mt")>)
+```
+
+
 上面，t为所要复制的分布式表。backup函数把分布式表中符合条件的数据备份到backupDir目录中。复制数据的条件通过sql元代码指定，上面例子中复制数据库t中列day为2019.01.01的一天的数据。
 
-* __节点间数据文件同步__ ，DolphinDB支持shell命令，可利用操作系统提供的文件同步手段来同步目录，比如rsync或者scp命令。其中rsync是linux上的常用命令，只同步发生变化的文件，非常高效。
+* __节点间数据文件同步__ ，如果需要同步的两个数据库不在同一台物理机器上，则需要同步二进制文件。DolphinDB支持shell命令，可利用操作系统提供的文件同步手段来同步目录，比如rsync或者scp命令。其中rsync是linux上的常用命令，只同步发生变化的文件，非常高效。
 ```
 cmd = "rsync -av  " + backupDir + "/*  " + userName + "@" + restoreIP + ":" + restoreDir 
 shell(cmd)
 ```
-如上，把一台机器上backupDir目录下的所有发生变化的文件同步到另一条机器的restoreDir目录下。注意:自动同步需要配置ssh免密登录。
+如上，把一台机器上backupDir目录下的所有发生变化的文件同步到另一条机器的restoreDir目录下。其中，userName和restoreIP是通过ssh登录的用户名以及远程机器的ip地址。
+注意:以上命令需要配置ssh免密登录。当然，也可以通过其他服务器同步工具实现。
 
 * __数据恢复__ ，数据同步过来以后，可以从restoreDir中恢复出所需要的数据，通过DolphinDB提供的restore函数
 ```
