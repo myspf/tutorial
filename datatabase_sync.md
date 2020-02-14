@@ -8,8 +8,8 @@ DolphinDB提供离线方式和在线方式实现不同集群间数据库的同�
 离线方式是先把数据库中的各个表，通过DolphinDB提供的backup函数以二进制形式导入到磁盘上，然后将数据同步的到数据库所在的物理机器上，再通过restore函数把将数据从磁盘上恢复到到数据库中。如下所示：
 ![image](https://github.com/myspf/tutorial/blob/master/Selection_387.png) 
 
-### 1.1 同步流程
-* __数据备份__ ，可通过backup函数将需要同步的数据表备份到磁盘上，备份是以分区为单位。需要同步的数据可以用sql语句指定，如下：
+### 1.1 数据备份
+通过backup函数将需要同步的数据表备份到磁盘上，备份是以分区为单位。需要同步的数据可以用sql语句指定，如下：
 示例1，备份数据库(db1)中表(mt)的所有数据：
 ```
 backupDir = /hdd/hdd1/backDir		
@@ -29,7 +29,8 @@ backup(backupDir,<select col1,col2,col3 from loadTable("dfs://db1","mt")>)
 ```
 更灵活的sql元语句表示参考DolphinDB元编程。
 
-* __节点间数据文件同步__ ，如果需要同步的两个数据库不在同一台物理机器上，则需要同步二进制文件。DolphinDB支持shell命令，可利用操作系统提供的文件同步手段来同步目录，比如rsync或者scp命令。其中rsync是linux上的常用命令，只同步发生变化的文件，非常高效。
+### 1.2 节点间数据文件同步
+如果需要同步的两个数据库不在同一台物理机器上，则需要同步二进制文件。DolphinDB支持shell命令，可利用操作系统提供的文件同步手段来同步目录，比如rsync或者scp命令。其中rsync是linux上的常用命令，只同步发生变化的文件，非常高效。
 ```
 cmd = "rsync -av  " + backupDir + "/*  " + userName + "@" + restoreIP + ":" + restoreDir 
 shell(cmd)
@@ -37,12 +38,18 @@ shell(cmd)
 如上，把一台机器上backupDir目录下的所有发生变化的文件同步到另一条机器的restoreDir目录下。其中，userName和restoreIP是通过ssh登录的用户名以及远程机器的ip地址。
 注意:以上命令需要配置ssh免密登录。当然，也可以通过其他服务器同步工具实现。
 
-* __数据恢复__ ，数据同步过来以后，可以从restoreDir中恢复出所需要的数据，通过DolphinDB提供的restore函数
+### 1.3 数据恢复
+数据同步过来以后，可以从restoreDir中恢复出所需要的数据，通过DolphinDB提供的restore函数
 示例1，恢复所有备份数据库(db1)表(mt)的所有数据到数据库(db2)的表(mt)中：
 ```
 restore(restoreDir,"dfs://db1","mt","%",true,loadTable("dfs://db2","mt"))
 ```
 除了恢复所有数据，还可以根据条件恢复指定分区。详细参考教程考[数据备份与恢复](https://github.com/dolphindb/Tutorials_CN/blob/master/restore-backup.md)。
+
+### 1.4 具体实例
+两个DolphinDB集群部署在不同的机器上，需要每天22:30点，同步A集群上的数据库(db1，包括表mt)的所有当前数据到B集群上。数据库db1的分区类型为VALUE,按天分区，分区字段为Timestamp(类型为TIMESTAMP)。
+具体实现如下：
+
 
 ## 2 在线方式
 在线方式，要求两个集群同时在线，通过建立socket连接，直接从一个集群中读数据，并写入到另一个集群上。如下
