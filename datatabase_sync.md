@@ -98,7 +98,23 @@ def synDataBaseOnline(restoreServerIP,restoreServerPort){
 脚本在备份节点执行，从数据库中取出当前的数据，并远程写入到恢复节点的数据库中。
 
 场景2，当天数据量太大，内存不足以容纳：
-
+```
+def writeData(dbName,tableName,t) : loadTable(dbName,tableName).append!(t)
+def writeRemoteDB(t, ip, port, dbName,tableName){
+	conn = xdb(ip, port)
+	conn(login{`admin,`123456})
+	remoteRun(conn,writeData,dbName,tableName,t)
+}
+def synDataBaseOnline(ip, port){
+	ts = <select * from loadTable("dfs://db1","mt") where Timestamp > timestamp(date(now())) and Timestamp < now()>
+	ds = repartitionDS(ts,`sym,RANGE,10)
+	mr(ds, writeRemoteDB{,ip,port,"dfs://db1","mt"},,, false)
+}
+login(`admin,`123456)
+restoreServerIP = '115.239.209.234'
+restoreServerPort = 18848
+synDataBaseOnline(restoreServerIP,restoreServerPort)
+```
 
 在线同步的一个关键问题是，如何避免一次拷贝的数据量太大，导致内存不够。这里我们采用的方法是，通过repartitionDS函数，将一天数据再进行切分，切分成多个数据块后，再进行数据同步，避免内存不足。
 
