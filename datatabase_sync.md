@@ -128,12 +128,12 @@ scheduleJob("syncDB","syncDB",synDataBaseOnline{restoreServerIP,restoreServerPor
 
 ## 3 两种方式比较及应用场景
 ### 3.1 比较
-如下表：
+如下表：  
 name | 价格 |  数量  
 -|-|-
 香蕉 | $1 | 5 |
 苹果 | $1 | 6 |
-草莓 | $1 | 7 |
+草莓 | $1 | 7 |  
 性能：
 内存：
 磁盘占用：
