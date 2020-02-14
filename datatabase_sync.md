@@ -49,7 +49,31 @@ restore(restoreDir,"dfs://db1","mt","%",true,loadTable("dfs://db2","mt"))
 ### 1.4 具体实例
 两个DolphinDB集群部署在不同的机器上，需要每天22:30点，同步A集群上的数据库(db1，包括表mt)的所有当前数据到B集群上。数据库db1的分区类型为VALUE,按天分区，分区字段为Timestamp(类型为TIMESTAMP)。
 具体实现如下：
+```
+def syncDataBases(backupNodeIP,backupNodePort,backupDir,restoreServerIP, userName,restoreDir){
+	conn = xdb(backupNodeIP,backupNodePort)
+	conn(login{`admin,`123456})
+	conn(backup{backupDir,<select * from loadTable("dfs://db1","mt") where Timestamp > timestamp(date(now())) and Timestamp < now()>})
+	cmd = "rsync -av  " + backupDir + "/*  " + userName + "@" + restoreServerIP + ":" + restoreDir 
+	conn(shell{cmd})
+	restore(restoreDir,"dfs://db1","mt","%",true,loadTable("dfs://db1","mt"))
+}
 
+login(`admin,`123456)
+//配置备份节点的ip，端口，以及备份机器上的物理目录，该目录应是空目录
+backupNodeIP = '115.239.209.234' 
+backupNodePort = 18846
+backupDir = "/home/pfsui/myselfTest/backupDir"
+//配置恢复数据节点的ip，由备份机器到恢复机器的ssh登录用户名（机器间应配置好ssh免密登录），以及恢复节点上的物理空目录
+restoreServerIP = '115.239.209.234'
+userName = 'user1'
+restoreDir = "/home/pfsui/myselfTest/backupDir"
+
+//手动触发备份
+syncDataBases(backupNodeIP,backupNodePort,backupDir,restoreServerIP, userName,restoreDir)
+//通过scheduleJob方式，每天22:30定时执行
+scheduleJob("syncDB","syncDB",syncDataBases{backupNodeIP,backupNodePort,backupDir,restoreServerIP, userName,restoreDir},22:30m,2019.01.01,2030.12.31,'D')
+```
 
 ## 2 在线方式
 在线方式，要求两个集群同时在线，通过建立socket连接，直接从一个集群中读数据，并写入到另一个集群上。如下
