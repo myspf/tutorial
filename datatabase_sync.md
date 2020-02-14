@@ -94,6 +94,10 @@ def synDataBaseOnline(restoreServerIP,restoreServerPort){
 	conn(login{`admin,`123456})
 	conn(writeData{"dfs://db1","mt",t})
 }
+login(`admin,`123456)
+restoreServerIP = '115.239.209.234'
+restoreServerPort = 18848
+synDataBaseOnline(restoreServerIP,restoreServerPort)
 ```
 脚本在备份节点执行，从数据库中取出当前的数据，并远程写入到恢复节点的数据库中。
 
@@ -113,10 +117,14 @@ def synDataBaseOnline(ip, port){
 login(`admin,`123456)
 restoreServerIP = '115.239.209.234'
 restoreServerPort = 18848
-synDataBaseOnline(restoreServerIP,restoreServerPort)
-```
 
-在线同步的一个关键问题是，如何避免一次拷贝的数据量太大，导致内存不够。这里我们采用的方法是，通过repartitionDS函数，将一天数据再进行切分，切分成多个数据块后，再进行数据同步，避免内存不足。
+//手动触发
+synDataBaseOnline(restoreServerIP,restoreServerPort)
+
+//定时触发
+scheduleJob("syncDB","syncDB",synDataBaseOnline{restoreServerIP,restoreServerPort},22:30m,2019.01.01,2030.12.31,'D')
+```
+如果当天的数据量太大，可以通过 __repartitionDS__ 函数将数据在分区，该用例我们把当天数据按照sym字段再进行切分为10个，最后通过mr函数对细分的数据逐一写入到远程，mr函数最后一个函数我们采用false，是串行执行，目的是少占用内存，当然如果内存充足，并行的效率更高。
 
 ### 3 两种方式的比较
 离线方式，要求要有额外的磁盘空间存储同步的数据，并且数据转移3次（先备份到磁盘，在转移到另一台机器，再导入），性能相较同步的方式会差。优势是，如果数据库多种多样，分区错综复杂，那么这种方式使用方便，几乎不用考虑分区和内存，因此，backup函数自动按照分区进行进行操作。
