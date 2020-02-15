@@ -9,7 +9,7 @@ DolphinDB提供离线方式和在线方式实现不同集群间数据库的同�
 ![image](https://github.com/myspf/tutorial/blob/master/Selection_387.png) 
 
 ### 1.1 数据备份
-通过backup函数将需要同步的数据表备份到磁盘上，备份是以分区为单位。需要同步的数据可以用sql语句指定，如下：
+通过backup函数将需要同步的数据表备份到磁盘上，备份是以分区为单位。需要同步的数据可以用sql语句指定，如下：  
 示例1，备份数据库(db1)中表(mt)的所有数据：
 ```
 backupDir = /hdd/hdd1/backDir		
@@ -47,7 +47,7 @@ restore(restoreDir,"dfs://db1","mt","%",true,loadTable("dfs://db2","mt"))
 除了恢复所有数据，还可以根据条件恢复指定分区。详细参考教程考[数据备份与恢复](https://github.com/dolphindb/Tutorials_CN/blob/master/restore-backup.md)。
 
 ### 1.4 具体实例
-两个DolphinDB集群部署在不同的机器上，需要每天22:30点，同步A集群上的数据库(db1，包括表mt)的所有当前数据到B集群上。数据库db1的分区类型为VALUE,按天分区，分区字段为Timestamp(类型为TIMESTAMP)。  
+两个DolphinDB集群部署在不同的机器上，需要每天22:30点，同步A集群上的数据库(db1，包括表mt)的所有当前数据到B集群上。数据库db1的分区类型为VALUE,按天分区，分区字段为Timestamp(类型为TIMESTAMP)。    
 具体实现如下:
 ```
 //脚本需要在B集群上，也就时需要恢复数据的集群上执行
@@ -75,6 +75,7 @@ syncDataBases(backupNodeIP,backupNodePort,backupDir,restoreServerIP, userName,re
 //通过scheduleJob方式，每天22:30定时执行
 scheduleJob("syncDB","syncDB",syncDataBases{backupNodeIP,backupNodePort,backupDir,restoreServerIP, userName,restoreDir},22:30m,2019.01.01,2030.12.31,'D')
 ```
+先通过backup函数备份数据数据到系统磁盘，然后同shell命令rsync来同步不同物理机器上的目录，最后同restore函数来恢复数据到数据库。可以利用scheduleJob函数来启动定时任务。
 
 ## 2 在线方式
 ### 2.1 数据在线同步
